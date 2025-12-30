@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tableau de Bord{% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12 col-sm-6 col-md-3">
+      <div class="info-box">
+        <span class="info-box-icon bg-info elevation-1"><i class="fas fa-graduation-cap"></i></span>
+        <div class="info-box-content">
+          <span class="info-box-text">Total Élèves</span>
+          <span class="info-box-number">{{ total_students }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-12 col-sm-6 col-md-3">
+      <div class="info-box mb-3">
+        <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-users"></i></span>
+        <div class="info-box-content">
+          <span class="info-box-text">Personnel</span>
+          <span class="info-box-number">{{ total_staff }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-3">
+      <div class="info-box mb-3">
+        <span class="info-box-icon bg-success elevation-1"><i class="fas fa-file-invoice-dollar"></i></span>
+        <div class="info-box-content">
+          <span class="info-box-text">Factures Payées</span>
+          <span class="info-box-number">{{ total_invoices }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-md-3">
+      <div class="info-box mb-3">
+        <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-book"></i></span>
+        <div class="info-box-content">
+          <span class="info-box-text">Matières</span>
+          <span class="info-box-number">{{ total_subjects }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header border-transparent">
+          <h3 class="card-title">Inscriptions Récentes</h3>
+          <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+              <i class="fas fa-minus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table m-0">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nom de l'élève</th>
+                  <th>Classe</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for student in recent_students %}
+                <tr>
+                  <td>{{ student.registration_number }}</td>
+                  <td>{{ student.firstname }} {{ student.surname }}</td>
+                  <td>{{ student.current_class }}</td>
+                  <td><span class="badge badge-success">Actif</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center">Aucun élève enregistré récemment.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer clearfix">
+          <a href="{% url 'student-create' %}" class="btn btn-sm btn-info float-left">Nouvel Élève</a>
+          <a href="{% url 'student-list' %}" class="btn btn-sm btn-secondary float-right">Voir tous les élèves</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Informations Système</h3>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-unbordered mb-3">
+            <li class="list-group-item">
+              <b>Session Actuelle</b> <a class="float-right text-primary">{{ current_session }}</a>
+            </li>
+            <li class="list-group-item">
+              <b>Trimestre</b> <a class="float-right text-primary">{{ current_term }}</a>
+            </li>
+          </ul>
+          <a href="{% url 'configs' %}" class="btn btn-primary btn-block"><b>Modifier les paramètres</b></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

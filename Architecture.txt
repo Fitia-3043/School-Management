@@ -1,0 +1,2 @@
+Python=> Django			Code
+tkinter-> HTML CSS JavaScript	Interface
