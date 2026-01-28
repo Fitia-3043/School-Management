@@ -155,7 +155,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 SESSION_COOKIE_AGE = 10800
 
-
+LOGGING = {}
 # LOGGING = {
 #     "version": 1,
 #     "disable_existing_loggers": False,
