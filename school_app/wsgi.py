@@ -17,4 +17,4 @@ if path not in sys.path:
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'school_app.settings')
 application = get_wsgi_application()
-app = application # Ilaina @vercel
+app = application # Ilaina  @vercel
