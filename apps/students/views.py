@@ -2,18 +2,20 @@ import csv
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.forms import widgets
 from django.http import HttpResponse
+from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import DetailView, ListView, View
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django import forms as widgets
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView, View
+
+from apps.users.mixins import AdminRequiredMixin
+from .forms import StudentBulkUploadForm
+from .models import Student, StudentBulkUpload
 
 from apps.finance.models import Invoice
 
-from .models import Student, StudentBulkUpload
 
-
-class StudentListView(LoginRequiredMixin, ListView):
+class StudentListView(AdminRequiredMixin, ListView):
     model = Student
     template_name = "students/student_list.html"
 
@@ -28,10 +30,11 @@ class StudentDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class StudentCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class StudentCreateView(AdminRequiredMixin, SuccessMessageMixin, CreateView):
     model = Student
     fields = "__all__"
-    success_message = "New student successfully added."
+    success_url = reverse_lazy("student-list")
+    success_message = "%(registration_number)s a été ajouté avec succès"
 
     def get_form(self):
         """add date picker in forms"""
@@ -42,27 +45,27 @@ class StudentCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         return form
 
 
-class StudentUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class StudentUpdateView(AdminRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Student
     fields = "__all__"
-    success_message = "Record successfully updated."
+    success_url = reverse_lazy("student-list")
+    success_message = "%(registration_number)s a été mis à jour avec succès"
 
     def get_form(self):
         """add date picker in forms"""
         form = super(StudentUpdateView, self).get_form()
         form.fields["date_of_birth"].widget = widgets.DateInput(attrs={"type": "date"})
-        form.fields["date_of_admission"].widget = widgets.DateInput(
-            attrs={"type": "date"}
-        )
+        form.fields["date_of_admission"].widget = widgets.DateInput(attrs={"type": "date"})
         form.fields["address"].widget = widgets.Textarea(attrs={"rows": 2})
         form.fields["others"].widget = widgets.Textarea(attrs={"rows": 2})
         # form.fields['passport'].widget = widgets.FileInput()
         return form
 
 
-class StudentDeleteView(LoginRequiredMixin, DeleteView):
+class StudentDeleteView(AdminRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Student
     success_url = reverse_lazy("student-list")
+    success_message = "%(registration_number)s a été supprimé avec succès"
 
 
 class StudentBulkUploadView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
@@ -73,7 +76,7 @@ class StudentBulkUploadView(LoginRequiredMixin, SuccessMessageMixin, CreateView)
     success_message = "Successfully uploaded students"
 
 
-class DownloadCSVViewdownloadcsv(LoginRequiredMixin, View):
+class DownloadCSVView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         response = HttpResponse(content_type="text/csv")
         response["Content-Disposition"] = 'attachment; filename="student_template.csv"'

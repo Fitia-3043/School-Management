@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Mon profil{% endblock title %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h4>Informations du profil</h4>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="{{ form.first_name.id_for_label }}">Prénom</label>
+                {{ form.first_name | add_class:"form-control" }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="{{ form.last_name.id_for_label }}">Nom</label>
+                {{ form.last_name | add_class:"form-control" }}
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group mb-3">
+            <label for="{{ form.email.id_for_label }}">Email</label>
+            {{ form.email | add_class:"form-control" }}
+          </div>
+          
+          <div class="form-group mb-3">
+            <label for="{{ form.phone.id_for_label }}">Téléphone</label>
+            {{ form.phone | add_class:"form-control" }}
+          </div>
+          
+          <div class="form-group mb-3">
+            <label for="{{ form.date_of_birth.id_for_label }}">Date de naissance</label>
+            {{ form.date_of_birth | add_class:"form-control" }}
+          </div>
+          
+          <div class="form-group mb-3">
+            <label for="{{ form.address.id_for_label }}">Adresse</label>
+            {{ form.address | add_class:"form-control" | attr:"rows:3" }}
+          </div>
+          
+          <button type="submit" class="btn btn-primary">Mettre à jour le profil</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5>Informations du compte</h5>
+      </div>
+      <div class="card-body">
+        <p><strong>Nom d'utilisateur:</strong> {{ user.username }}</p>
+        <p><strong>Rôle:</strong> {{ user.get_role_display }}</p>
+        <p><strong>Date d'inscription:</strong> {{ user.date_joined|date:"d/m/Y" }}</p>
+        <p><strong>Dernière connexion:</strong> {{ user.last_login|date:"d/m/Y H:i" }}</p>
+        
+        <hr>
+        
+        <h6>Changer le mot de passe</h6>
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group mb-2">
+            <input type="password" name="current_password" class="form-control" placeholder="Mot de passe actuel" required>
+          </div>
+          <div class="form-group mb-2">
+            <input type="password" name="new_password" class="form-control" placeholder="Nouveau mot de passe" required>
+          </div>
+          <div class="form-group mb-2">
+            <input type="password" name="confirm_password" class="form-control" placeholder="Confirmer le mot de passe" required>
+          </div>
+          <button type="submit" name="change_password" class="btn btn-warning btn-sm">Changer le mot de passe</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

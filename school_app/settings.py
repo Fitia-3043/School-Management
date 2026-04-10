@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 import sys
 from pathlib import Path
+from decouple import config
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
@@ -21,13 +22,29 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "__$1ud47e&nyso5h5o3fwnqu4+hfqcply9h$k*h2s34)hn5@nc"
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-# ALLOWED_HOSTS = ['school-management-fitia.vercel.app', 'localhost', '127.0.0.1']
-ALLOWED_HOSTS = ['*']
+# PythonAnywhere configuration
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: [s.strip() for s in v.split(',')])
+
+# Database configuration
+import dj_database_url
+
+if config('DATABASE_URL', default=None):
+    DATABASES = {
+        'default': dj_database_url.parse(config('DATABASE_URL'))
+    }
+else:
+    # Local development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Application definition
@@ -45,8 +62,8 @@ INSTALLED_APPS = [
     "apps.staffs",
     "apps.finance",
     "apps.result",
+    "apps.users",
     "django_extensions",
-    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -140,13 +157,22 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
+# Static files configuration for production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 MEDIA_URL = "/media/"
 
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "/dashboard/"
 
 LOGOUT_REDIRECT_URL = "/"
+
+# Configuration du modèle utilisateur personnalisé
+AUTH_USER_MODEL = 'users.CustomUser'
+
+# URLs d'authentification personnalisées
+LOGIN_URL = '/accounts/login/'
 
 
 SESSION_SAVE_EVERY_REQUEST = True

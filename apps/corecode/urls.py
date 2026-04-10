@@ -20,6 +20,7 @@ from .views import (
     TermDeleteView,
     TermListView,
     TermUpdateView,
+    logout_view,
 )
 
 urlpatterns = [
@@ -60,4 +61,5 @@ urlpatterns = [
         SubjectDeleteView.as_view(),
         name="subject-delete",
     ),
+    path("logout/", logout_view, name="logout"),
 ]

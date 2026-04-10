@@ -2,6 +2,35 @@
 
 {% block fullcard %}
 
+<!-- Barre de recherche -->
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="GET" class="row">
+      <div class="col-md-8">
+        <div class="input-group">
+          <input type="text" name="search" class="form-control" placeholder="Rechercher un élève..." value="{{ request.GET.search }}">
+          <div class="input-group-append">
+            <button class="btn btn-primary" type="submit">
+              <i class="fas fa-search"></i> Rechercher
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <button class="btn btn-secondary" type="button" onclick="clearSearch()">
+          <i class="fas fa-times"></i> Effacer
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function clearSearch() {
+  window.location.href = "{% url 'view-results' %}";
+}
+</script>
+
   {% for key, result in results.items %}
     <div class="card">
       <div class="card-header">
@@ -12,11 +41,11 @@
           <thead class="thead-light">
             <tr>
               <th></th>
-              <th>Subject</th>
-              <th>Test Score</th>
-              <th>Exam Score</th>
-              <th>Total Score</th>
-              <th>Grade</th>
+              <th>Matière</th>
+              <th>Note de test</th>
+              <th>Note d'examen</th>
+              <th>Note totale</th>
+              <th>Note</th>
             </tr>
           </thead>
           <tbody>
@@ -44,7 +73,21 @@
 
 
 
-
+      </div>
+    </div>
+  {% empty %}
+    <div class="card">
+      <div class="card-body text-center">
+        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">Aucun résultat trouvé</h4>
+        <p class="text-muted">
+          {% if request.GET.search %}
+            Essayez avec un autre nom d'élève ou 
+            <a href="{% url 'view-results' %}" class="btn btn-sm btn-primary">affichez tous les résultats</a>
+          {% else %}
+            <a href="{% url 'create-result' %}" class="btn btn-primary">Ajoutez des résultats</a> pour commencer
+          {% endif %}
+        </p>
       </div>
     </div>
   {% endfor %}

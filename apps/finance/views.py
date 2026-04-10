@@ -1,10 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
+from apps.users.mixins import AdminRequiredMixin
 from apps.students.models import Student
 
 from .forms import InvoiceItemFormset, InvoiceReceiptFormSet, Invoices
@@ -13,9 +13,42 @@ from .models import Invoice, InvoiceItem, Receipt
 
 class InvoiceListView(LoginRequiredMixin, ListView):
     model = Invoice
+    template_name = "finance/invoice_list.html"
+    paginate_by = 25
+
+    def get_queryset(self):
+        # Récupérer le terme de recherche
+        search_query = self.request.GET.get('search', '').strip()
+        
+        # Filtrer selon le rôle de l'utilisateur
+        if hasattr(self.request.user, 'role'):
+            if self.request.user.role == 'student':
+                # Étudiant : ne voir que ses propres factures
+                queryset = Invoice.objects.filter(
+                    student=self.request.user.student_profile
+                )
+            elif self.request.user.role in ['admin', 'staff']:
+                # Admin/Staff : voir toutes les factures
+                queryset = super().get_queryset()
+            else:
+                queryset = Invoice.objects.none()
+        else:
+            queryset = super().get_queryset()
+        
+        # Appliquer la recherche si fournie
+        if search_query:
+            queryset = queryset.filter(
+                student__surname__icontains=search_query
+            ) | queryset.filter(
+                student__firstname__icontains=search_query
+            ) | queryset.filter(
+                student__other_name__icontains=search_query
+            )
+        
+        return queryset
 
 
-class InvoiceCreateView(LoginRequiredMixin, CreateView):
+class InvoiceCreateView(AdminRequiredMixin, LoginRequiredMixin, CreateView):
     model = Invoice
     fields = "__all__"
     success_url = "/finance/list"
@@ -43,31 +76,47 @@ class InvoiceCreateView(LoginRequiredMixin, CreateView):
 
 class InvoiceDetailView(LoginRequiredMixin, DetailView):
     model = Invoice
-    fields = "__all__"
+    template_name = "finance/invoice_detail.html"
+
+    def get_object(self):
+        invoice = super().get_object()
+        
+        # Vérifier les permissions : étudiant ne peut voir que ses factures
+        if hasattr(self.request.user, 'role') and self.request.user.role == 'student':
+            if invoice.student != self.request.user.student_profile:
+                from django.core.exceptions import PermissionDenied
+                raise PermissionDenied("Vous n'avez pas l'autorisation de voir cette facture.")
+        
+        return invoice
 
     def get_context_data(self, **kwargs):
         context = super(InvoiceDetailView, self).get_context_data(**kwargs)
-        context["receipts"] = Receipt.objects.filter(invoice=self.object)
         context["items"] = InvoiceItem.objects.filter(invoice=self.object)
+        context["receipts"] = Receipt.objects.filter(invoice=self.object)
         return context
 
 
-class InvoiceUpdateView(LoginRequiredMixin, UpdateView):
+class InvoiceUpdateView(AdminRequiredMixin, LoginRequiredMixin, UpdateView):
     model = Invoice
-    fields = ["student", "session", "term", "class_for", "balance_from_previous_term"]
+    fields = "__all__"
+    success_url = "/finance/list"
 
     def get_context_data(self, **kwargs):
         context = super(InvoiceUpdateView, self).get_context_data(**kwargs)
         if self.request.POST:
             context["receipts"] = InvoiceReceiptFormSet(
-                self.request.POST, instance=self.object
+                self.request.POST, prefix="receipt_set"
             )
             context["items"] = InvoiceItemFormset(
-                self.request.POST, instance=self.object
+                self.request.POST, prefix="invoiceitem_set"
             )
         else:
-            context["receipts"] = InvoiceReceiptFormSet(instance=self.object)
-            context["items"] = InvoiceItemFormset(instance=self.object)
+            context["receipts"] = InvoiceReceiptFormSet(
+                instance=self.object, prefix="receipt_set"
+            )
+            context["items"] = InvoiceItemFormset(
+                instance=self.object, prefix="invoiceitem_set"
+            )
         return context
 
     def form_valid(self, form):
@@ -81,9 +130,15 @@ class InvoiceUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class InvoiceDeleteView(LoginRequiredMixin, DeleteView):
+class InvoiceDeleteView(AdminRequiredMixin, LoginRequiredMixin, DeleteView):
     model = Invoice
     success_url = reverse_lazy("invoice-list")
+    
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+        from django.contrib import messages
+        messages.success(request, f"La facture de {obj.student} a été supprimée avec succès.")
+        return super().delete(request, *args, **kwargs)
 
 
 class ReceiptCreateView(LoginRequiredMixin, CreateView):

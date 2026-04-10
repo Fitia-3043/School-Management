@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Connexion{% endblock title %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="text-center">Connexion</h4>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="form-group mb-3">
+            <label for="{{ form.username.id_for_label }}">Nom d'utilisateur</label>
+            {{ form.username | add_class:"form-control" }}
+            {% if form.username.errors %}
+              <div class="text-danger">{{ form.username.errors }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="form-group mb-3">
+            <label for="{{ form.password.id_for_label }}">Mot de passe</label>
+            {{ form.password | add_class:"form-control" }}
+            {% if form.password.errors %}
+              <div class="text-danger">{{ form.password.errors }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="form-group mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="remember" name="remember">
+              <label class="form-check-label" for="remember">
+                Se souvenir de moi
+              </label>
+            </div>
+          </div>
+          
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary">Se connecter</button>
+          </div>
+        </form>
+        
+        <div class="text-center mt-3">
+          <p>Pas encore de compte? <a href="{% url 'signup' %}">Créez un compte</a></p>
+          <p><a href="{% url 'password_reset' %}">Mot de passe oublié?</a></p>
+        </div>
+        
+        <div class="mt-4">
+          <h6>Comptes de test:</h6>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="card border-primary">
+                <div class="card-body">
+                  <h6>Administrateur</h6>
+                  <small>admin / admin123</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card border-success">
+                <div class="card-body">
+                  <h6>Personnel</h6>
+                  <small>enseignant / enseignant123</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card border-info">
+                <div class="card-body">
+                  <h6>Étudiant</h6>
+                  <small>etudiant / etudiant123</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

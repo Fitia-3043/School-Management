@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import (
-    DownloadCSVViewdownloadcsv,
+    DownloadCSVView,
     StudentBulkUploadView,
     StudentCreateView,
     StudentDeleteView,
@@ -17,5 +17,5 @@ urlpatterns = [
     path("<int:pk>/update/", StudentUpdateView.as_view(), name="student-update"),
     path("delete/<int:pk>/", StudentDeleteView.as_view(), name="student-delete"),
     path("upload/", StudentBulkUploadView.as_view(), name="student-upload"),
-    path("download-csv/", DownloadCSVViewdownloadcsv.as_view(), name="download-csv"),
+    path("download-csv/", DownloadCSVView.as_view(), name="download-csv"),
 ]

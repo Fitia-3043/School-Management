@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Inscription{% endblock title %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="text-center">Créer un compte</h4>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="form-group mb-3">
+            <label for="{{ form.username.id_for_label }}">Nom d'utilisateur</label>
+            {{ form.username | add_class:"form-control" }}
+            {% if form.username.errors %}
+              <div class="text-danger">{{ form.username.errors }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="form-group mb-3">
+            <label for="{{ form.email.id_for_label }}">Email</label>
+            {{ form.email | add_class:"form-control" }}
+            {% if form.email.errors %}
+              <div class="text-danger">{{ form.email.errors }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="{{ form.first_name.id_for_label }}">Prénom</label>
+                {{ form.first_name | add_class:"form-control" }}
+                {% if form.first_name.errors %}
+                  <div class="text-danger">{{ form.first_name.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="{{ form.last_name.id_for_label }}">Nom</label>
+                {{ form.last_name | add_class:"form-control" }}
+                {% if form.last_name.errors %}
+                  <div class="text-danger">{{ form.last_name.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group mb-3">
+            <label for="{{ form.role.id_for_label }}">Rôle</label>
+            {{ form.role | add_class:"form-control" }}
+            {% if form.role.errors %}
+              <div class="text-danger">{{ form.role.errors }}</div>
+            {% endif %}
+            <small class="form-text text-muted">
+              <strong>Administrateur:</strong> Accès complet au système<br>
+              <strong>Personnel:</strong> Enseignant et personnel administratif<br>
+              <strong>Étudiant:</strong> Accès limité aux informations personnelles
+            </small>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="{{ form.password1.id_for_label }}">Mot de passe</label>
+                {{ form.password1 | add_class:"form-control" }}
+                {% if form.password1.errors %}
+                  <div class="text-danger">{{ form.password1.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="{{ form.password2.id_for_label }}">Confirmer le mot de passe</label>
+                {{ form.password2 | add_class:"form-control" }}
+                {% if form.password2.errors %}
+                  <div class="text-danger">{{ form.password2.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary">Créer le compte</button>
+          </div>
+        </form>
+        
+        <div class="text-center mt-3">
+          <p>Déjà un compte? <a href="{% url 'login' %}">Connectez-vous ici</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

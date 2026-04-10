@@ -30,13 +30,19 @@ class AcademicTerm(models.Model):
     """Academic Term"""
 
     name = models.CharField(max_length=20, unique=True)
-    current = models.BooleanField(default=True)
+    current = models.BooleanField(default=False) # Changé à False par sécurité
 
     class Meta:
         ordering = ["name"]
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.current:
+            # On cherche tous les autres trimestres qui sont 'current' et on les passe à False
+            AcademicTerm.objects.filter(current=True).exclude(pk=self.pk).update(current=False)
+        super().save(*args, **kwargs)
 
 
 class Subject(models.Model):

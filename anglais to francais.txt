@@ -1,0 +1,70 @@
+## __Templates HTML avec textes anglais affichés__
+
+### __Templates principaux__
+
+- `templates/registration/login.html` - "Login", "Connexion", "Forgot", "Username / Password ?"
+- `templates/base.html` - "Home", "Logout", "Profile", "Students", "Staff", "Invoices", "Results", "Management", "Settings"
+- `templates/index.html` - "Total Students", "Staff", "Invoices Paid", "Subjects", "Recent Registrations", "New Student", "View all students", "Current Session", "Term", "Modify settings"
+- `templates/paginator.html` - "Previous", "Next"
+
+### __Templates Students__
+
+- `apps/students/templates/students/student_list.html` - "Fullname", "Registration Number", "Current Class", "Gender", "Mobile Phone Number", "Status", "New student", "Upload students"
+- `apps/students/templates/students/student_form.html` - "Update", "Add new student"
+- `apps/students/templates/students/student_confirm_delete.html` - "Are you sure you want to delete", "All contents attached to this student will be deleted"
+- `apps/students/templates/students/students_upload.html` - "Instruction", "Submit"
+
+### __Templates Staffs__
+
+- `apps/staffs/templates/staffs/staff_list.html` - "Fullname", "Gender", "Mobile Phone Number", "Status", "New staff"
+- `apps/staffs/templates/staffs/staff_form.html` - "Update", "Add new Staff"
+- `apps/staffs/templates/staffs/staff_detail.html` - "Date of Birth", "Mobile Number", "Address", "Comments"
+- `apps/staffs/templates/staffs/staff_confirm_delete.html` - "Are you sure you want to delete", "All contents attached to this staff will be deleted"
+
+### __Templates Finance__
+
+- `apps/finance/templates/finance/invoice_list.html` - "New Invoice"
+- `apps/finance/templates/finance/invoice_confirm_delete.html` - "Are you sure you want to delete invoice", "All receipts attached to this invoice will be deleted"
+- `apps/finance/templates/finance/receipt_form.html` - "Add payment", "INVOICE", "Session", "Term", "Class", "Total Amount Payable", "Total Amount Paid", "Balance"
+
+### __Templates Corecode__
+
+- `apps/corecode/templates/corecode/term_list.html` - "Add new term", "Current", "Edit", "Delete"
+- `apps/corecode/templates/corecode/subject_list.html` - "Add new subject", "Edit", "Delete"
+- `apps/corecode/templates/corecode/mgt_form.html` - "Save"
+- `apps/corecode/templates/corecode/siteconfig.html` - "Save"
+- `apps/corecode/templates/corecode/current_session.html` - "Save"
+
+### __Templates Result__
+
+- `apps/result/templates/result/create_result.html` - "Select Student(s)", "Proceed", "Name", "Current Class"
+- `apps/result/templates/result/create_result_page2.html` - "Select all the subjects you want to create", "Create"
+- `apps/result/templates/result/edit_results.html` - "Update Results", "Name", "Subject", "Test Score", "Exam Score", "Total", "Delete", "Class", "Save"
+- `apps/result/templates/result/all_results.html` - "Subject", "Test Score", "Exam Score", "Total Score", "Grade"
+
+## __Vues Python avec messages anglais__
+
+### __Fichiers views.py__
+
+- `apps/students/views.py` - "New student successfully added", "Record successfully updated"
+- `apps/staffs/views.py` - "New staff successfully added", "Record successfully updated"
+- `apps/finance/views.py` - "New invoice successfully added", "Invoice successfully updated", "Receipt successfully created"
+- `apps/corecode/views.py` - "New session successfully added", "Session successfully updated", "New term successfully added", "Term successfully updated", "New class successfully added", "class successfully updated", "New subject successfully added", "Subject successfully updated", "Configurations successfully updated"
+- `apps/result/views.py` - "Results successfully updated"
+
+## __Formulaires avec labels anglais__
+
+### __Fichiers forms.py__
+
+- `apps/result/forms.py` - "session", "term", "subjects"
+
+## __Modèles avec choix anglais__
+
+### __Fichiers models.py__
+
+- `apps/students/models.py` - "Active/Inactive", "Male/Female"
+- `apps/staffs/models.py` - "Active/Inactive", "Male/Female"
+
+## __Total : 25 fichiers principaux à modifier__
+
+Ces fichiers contiennent uniquement les textes affichés aux utilisateurs. Les éléments de code (noms de variables, fonctions, méthodes, classes, fichiers, chemins d'URL et noms de champs) ne sont pas inclus dans cette liste

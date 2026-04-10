@@ -1,0 +1,26 @@
+Requirement already satisfied: Django in /home/focal/Documents/code/venv/lib/python3.13/site-packages (3.2.25)
+Collecting Django
+  Downloading django-6.0.3-py3-none-any.whl.metadata (3.9 kB)
+Collecting asgiref>=3.9.1 (from Django)
+  Downloading asgiref-3.11.1-py3-none-any.whl.metadata (9.3 kB)
+Collecting sqlparse>=0.5.0 (from Django)
+  Downloading sqlparse-0.5.5-py3-none-any.whl.metadata (4.7 kB)
+Downloading django-6.0.3-py3-none-any.whl (8.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.4/8.4 MB 206.5 kB/s eta 0:00:00
+Downloading asgiref-3.11.1-py3-none-any.whl (24 kB)
+Downloading sqlparse-0.5.5-py3-none-any.whl (46 kB)
+Installing collected packages: sqlparse, asgiref, Django
+  Attempting uninstall: sqlparse
+    Found existing installation: sqlparse 0.4.4
+    Uninstalling sqlparse-0.4.4:
+      Successfully uninstalled sqlparse-0.4.4
+  Attempting uninstall: asgiref
+    Found existing installation: asgiref 3.4.1
+    Uninstalling asgiref-3.4.1:
+      Successfully uninstalled asgiref-3.4.1
+  Attempting uninstall: Django
+    Found existing installation: Django 3.2.25
+    Uninstalling Django-3.2.25:
+      Successfully uninstalled Django-3.2.25
+
+Successfully installed Django-6.0.3 asgiref-3.11.1 sqlparse-0.5.5

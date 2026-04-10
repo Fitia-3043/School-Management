@@ -12,7 +12,6 @@ from .models import (
 SiteConfigForm = modelformset_factory(
     SiteConfig,
     fields=(
-        "key",
         "value",
     ),
     extra=0,

@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Students{% endblock title %}
+{% block title %}Élèves{% endblock title %}
 
 {% block breadcrumb %}
 <a class="btn btn-primary" href="{% url 'student-create' %}"><i
-    class="fas fa-plus"></i> New student</a>
+    class="fas fa-plus"></i> Nouvel élève</a>
 <a class="btn btn-primary" href="{% url 'student-upload' %}"><i
-    class="fas fa-upload"></i> Upload students</a>
+    class="fas fa-upload"></i> Télécharger des élèves</a>
 {% endblock breadcrumb %}
 
 {% block content %}
@@ -15,12 +15,12 @@
       <thead class="thead-light">
         <tr>
           <th>S/N</th>
-          <th>Fullname</th>
-          <th>Registration Number</th>
-          <th>Current Class</th>
-          <th>Gender</th>
-          <th>Mobile Phone Number</th>
-          <th>Status</th>
+          <th>Nom complet</th>
+          <th>Numéro d'inscription</th>
+          <th>Classe actuelle</th>
+          <th>Genre</th>
+          <th>Numéro de téléphone mobile</th>
+          <th>Statut</th>
         </tr>
       </thead>
       <tbody>

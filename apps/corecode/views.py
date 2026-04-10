@@ -3,10 +3,28 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import HttpResponseRedirect, redirect, render
+from django.shortcuts import render, redirect
+from django.views.generic import (
+    TemplateView,
+    ListView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+    View,
+)
+from django.contrib.auth import logout
 from django.urls import reverse_lazy
-from django.views.generic import ListView, TemplateView, View
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.contrib.messages.views import SuccessMessageMixin
+from django import forms
 
+from apps.users.mixins import AdminRequiredMixin
+from .models import (
+    AcademicSession,
+    AcademicTerm,
+    SiteConfig,
+    StudentClass,
+    Subject,
+)
 from .forms import (
     AcademicSessionForm,
     AcademicTermForm,
@@ -15,17 +33,40 @@ from .forms import (
     StudentClassForm,
     SubjectForm,
 )
-from .models import (
-    AcademicSession,
-    AcademicTerm,
-    SiteConfig,
-    StudentClass,
-    Subject,
-)
-
+from apps.students.models import Student
+from apps.staffs.models import Staff
+from apps.finance.models import Invoice
+from apps.result.models import Result
 
 class IndexView(LoginRequiredMixin, TemplateView):
     template_name = "index.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        # Rediriger vers le dashboard approprié selon le rôle
+        if hasattr(request.user, 'role'):
+            if request.user.role == 'admin':
+                return redirect('dashboard')
+            elif request.user.role == 'staff':
+                return redirect('dashboard')
+            elif request.user.role == 'student':
+                return redirect('dashboard')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # On injecte les statistiques dans le dictionnaire context
+        context["total_students"] = Student.objects.count()
+        context["total_staff"] = Staff.objects.count()
+        context["total_subjects"] = Subject.objects.count()
+        context["total_invoices"] = Invoice.objects.filter(status='paid').count()
+        # On récupère les 5 derniers élèves inscrits
+        context["recent_students"] = Student.objects.all().order_by("-id")[:5]
+        
+        # Pour les sessions et trimestres actuels
+        context["current_session"] = AcademicSession.objects.filter(current=True).first()
+        context["current_term"] = AcademicTerm.objects.filter(current=True).first()
+        
+        return context
 
 
 class SiteConfigView(LoginRequiredMixin, View):
@@ -40,10 +81,11 @@ class SiteConfigView(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        formset = self.form_class(request.POST)
+        formset = self.form_class(request.POST, queryset=SiteConfig.objects.all())
         if formset.is_valid():
             formset.save()
             messages.success(request, "Configurations successfully updated")
+            return redirect('configs')
         context = {"formset": formset, "title": "Configuration"}
         return render(request, self.template_name, context)
 
@@ -58,7 +100,7 @@ class SessionListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
         return context
 
 
-class SessionCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class SessionCreateView(AdminRequiredMixin, SuccessMessageMixin, CreateView):
     model = AcademicSession
     form_class = AcademicSessionForm
     template_name = "corecode/mgt_form.html"
@@ -71,7 +113,7 @@ class SessionCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         return context
 
 
-class SessionUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class SessionUpdateView(AdminRequiredMixin, SuccessMessageMixin, UpdateView):
     model = AcademicSession
     form_class = AcademicSessionForm
     success_url = reverse_lazy("sessions")
@@ -92,7 +134,7 @@ class SessionUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         return super().form_valid(form)
 
 
-class SessionDeleteView(LoginRequiredMixin, DeleteView):
+class SessionDeleteView(AdminRequiredMixin, DeleteView):
     model = AcademicSession
     success_url = reverse_lazy("sessions")
     template_name = "corecode/core_confirm_delete.html"
@@ -117,7 +159,7 @@ class TermListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
         return context
 
 
-class TermCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class TermCreateView(AdminRequiredMixin, SuccessMessageMixin, CreateView):
     model = AcademicTerm
     form_class = AcademicTermForm
     template_name = "corecode/mgt_form.html"
@@ -125,7 +167,7 @@ class TermCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_message = "New term successfully added"
 
 
-class TermUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class TermUpdateView(AdminRequiredMixin, SuccessMessageMixin, UpdateView):
     model = AcademicTerm
     form_class = AcademicTermForm
     success_url = reverse_lazy("terms")
@@ -146,7 +188,7 @@ class TermUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         return super().form_valid(form)
 
 
-class TermDeleteView(LoginRequiredMixin, DeleteView):
+class TermDeleteView(AdminRequiredMixin, DeleteView):
     model = AcademicTerm
     success_url = reverse_lazy("terms")
     template_name = "corecode/core_confirm_delete.html"
@@ -171,7 +213,7 @@ class ClassListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
         return context
 
 
-class ClassCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class ClassCreateView(AdminRequiredMixin, SuccessMessageMixin, CreateView):
     model = StudentClass
     form_class = StudentClassForm
     template_name = "corecode/mgt_form.html"
@@ -179,7 +221,7 @@ class ClassCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_message = "New class successfully added"
 
 
-class ClassUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class ClassUpdateView(AdminRequiredMixin, SuccessMessageMixin, UpdateView):
     model = StudentClass
     fields = ["name"]
     success_url = reverse_lazy("classes")
@@ -187,7 +229,7 @@ class ClassUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     template_name = "corecode/mgt_form.html"
 
 
-class ClassDeleteView(LoginRequiredMixin, DeleteView):
+class ClassDeleteView(AdminRequiredMixin, DeleteView):
     model = StudentClass
     success_url = reverse_lazy("classes")
     template_name = "corecode/core_confirm_delete.html"
@@ -195,7 +237,6 @@ class ClassDeleteView(LoginRequiredMixin, DeleteView):
 
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()
-        print(obj.name)
         messages.success(self.request, self.success_message.format(obj.name))
         return super(ClassDeleteView, self).delete(request, *args, **kwargs)
 
@@ -210,7 +251,7 @@ class SubjectListView(LoginRequiredMixin, SuccessMessageMixin, ListView):
         return context
 
 
-class SubjectCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class SubjectCreateView(AdminRequiredMixin, SuccessMessageMixin, CreateView):
     model = Subject
     form_class = SubjectForm
     template_name = "corecode/mgt_form.html"
@@ -218,7 +259,7 @@ class SubjectCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_message = "New subject successfully added"
 
 
-class SubjectUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class SubjectUpdateView(AdminRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Subject
     fields = ["name"]
     success_url = reverse_lazy("subjects")
@@ -226,7 +267,7 @@ class SubjectUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     template_name = "corecode/mgt_form.html"
 
 
-class SubjectDeleteView(LoginRequiredMixin, DeleteView):
+class SubjectDeleteView(AdminRequiredMixin, DeleteView):
     model = Subject
     success_url = reverse_lazy("subjects")
     template_name = "corecode/core_confirm_delete.html"
@@ -238,34 +279,64 @@ class SubjectDeleteView(LoginRequiredMixin, DeleteView):
         return super(SubjectDeleteView, self).delete(request, *args, **kwargs)
 
 
-class CurrentSessionAndTermView(LoginRequiredMixin, View):
+class CurrentSessionAndTermView(AdminRequiredMixin, View):
     """Current SEssion and Term"""
 
     form_class = CurrentSessionForm
     template_name = "corecode/current_session.html"
 
     def get(self, request, *args, **kwargs):
+        try:
+            current_session = AcademicSession.objects.get(current=True)
+        except AcademicSession.DoesNotExist:
+            current_session = None
+        
+        try:
+            current_term = AcademicTerm.objects.get(current=True)
+        except AcademicTerm.DoesNotExist:
+            current_term = None
+            
         form = self.form_class(
             initial={
-                "current_session": AcademicSession.objects.get(current=True),
-                "current_term": AcademicTerm.objects.get(current=True),
+                "current_session": current_session,
+                "current_term": current_term,
             }
         )
         return render(request, self.template_name, {"form": form})
 
     def post(self, request, *args, **kwargs):
+        try:
+            current_session = AcademicSession.objects.get(current=True)
+        except AcademicSession.DoesNotExist:
+            current_session = None
+        
+        try:
+            current_term = AcademicTerm.objects.get(current=True)
+        except AcademicTerm.DoesNotExist:
+            current_term = None
+            
         form = self.form_class(
             request.POST,
             initial={
-                "current_session": AcademicSession.objects.get(current=True),
-                "current_term": AcademicTerm.objects.get(current=True),
+                "current_session": current_session,
+                "current_term": current_term,
             }
         )
         if form.is_valid():
             session = form.cleaned_data["current_session"]
             term = form.cleaned_data["current_term"]
-            AcademicSession.objects.filter(name=session).update(current=True)
-            AcademicSession.objects.exclude(name=session).update(current=False)
-            AcademicTerm.objects.filter(name=term).update(current=True)
+            if session:
+                AcademicSession.objects.filter(name=session).update(current=True)
+                AcademicSession.objects.exclude(name=session).update(current=False)
+            if term:
+                AcademicTerm.objects.filter(name=term).update(current=True)
+                AcademicTerm.objects.exclude(name=term).update(current=False)
 
         return render(request, self.template_name, {"form": form})
+
+
+def logout_view(request):
+    if request.method == 'POST':
+        logout(request)
+        return redirect('login')
+    return redirect('login')

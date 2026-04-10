@@ -1,0 +1,44 @@
+#####################333
+1. Créer compte PythonAnywhere
+2. Upload du projet via Git
+3. Configurer les variables d'environnement
+4. Installer les dépendances
+5. Lancer le serveur
+######################33
+
+
+        Projet prêt pour PythonAnywhere !
+Fichiers créés et configurés
+    Fichiers essentiels
+        Procfile : Configuration pour le serveur
+        .env.example : Modèle pour les variables d'environnement
+        README_PYTHONANYWHERE.md : Guide complet de déploiement
+        requirements.txt : Dépendances à jour
+    Configuration Django
+        Base de données : Support PostgreSQL + SQLite local
+        Hôtes autorisés : Configuration dynamique
+        Fichiers statiques : Optimisés pour la production
+        Variables d'environnement : Sécurisées avec python-decouple
+    Fichiers statiques
+        98 fichiers copiés dans /staticfiles/
+        Polices locales : Inter et Font Awesome
+        CSS/JS : Prêts pour la production
+Prochaines étapes
+    1. Créer un compte PythonAnywhere
+        Allez sur pythonanywhere.com
+        Inscrivez-vous (gratuit)
+        Notez votre nom d'utilisateur
+    2. Suivre le guide
+        Le fichier README_PYTHONANYWHERE.md contient :
+            Instructions détaillées
+            Commandes exactes
+            Configuration requise
+            Dépannage
+    3. Déployer
+        Le guide vous guidera étape par étape :
+        Cloner le projet
+        Configurer l'environnement
+        Créer la base de données
+        Lancer le serveur
+Résultat final
+Site accessible à : https://votrenom.pythonanywhere.com

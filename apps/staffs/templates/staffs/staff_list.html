@@ -1,21 +1,22 @@
 {% extends 'base.html' %}
 
-{% block title %}staffs{% endblock title %}
+{% block title %}Personnel{% endblock title %}
 
 {% block breadcrumb %}
 <a class="btn btn-primary" href="{% url 'staff-create' %}"><i
-    class="fas fa-plus"></i> New staff</a>
+    class="fas fa-plus"></i> Nouveau personnel</a>
 {% endblock breadcrumb %}
 
 {% block content %}
   <table id="stafftable" class="table table-bordered table-hover">
     <thead class="thead-light">
       <tr>
+        <th>N°</th>
         <th>S/N</th>
-        <th>Fullname</th>
-        <th>Gender</th>
-        <th>Mobile Phone Number</th>
-        <th>Status</th>
+        <th>Nom complet</th>
+        <th>Genre</th>
+        <th>Numéro de téléphone mobile</th>
+        <th>Statut</th>
       </tr>
     </thead>
     <tbody>

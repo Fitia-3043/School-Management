@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
 {% block title %}
-<span class="card-title"><strong>{{ object}}</strong> about to be
-  deleted!</span>
+<span class="card-title"><strong>{{ object}}</strong> sur le point d'être
+  supprimé!</span>
 {% endblock title %}
 
 
@@ -11,15 +11,15 @@
     <div class="col-sm-12">
       <div class="card">
         <div class="card-body">
-          <p>Are you sure you want to delete object <strong>{{ object}}</strong>
-            alongside all attached contents?</p>
-          <div class="mt-2 red-text">This action cannot be undone</div>
+          <p>Êtes-vous sûr de vouloir supprimer l'objet <strong>{{ object}}</strong>
+            ainsi que tous les contenus associés?</p>
+          <div class="mt-2 red-text">Cette action ne peut pas être annulée</div>
 
           <form method="POST" class="mt-3">
             {% csrf_token %}
 
             <button type="submit" class="btn btn-primary">
-              Confirm Delete
+              Confirmer la suppression
               <i class="fa fa-trash-alt"></i>
             </button>
           </form>
