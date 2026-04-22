@@ -48,7 +48,7 @@ pip install -r requirements.txt
 ```
 
 #### 3.4 Configurer les variables d'environnement
-```bash
+```bashl
 # Dans le bash de PythonAnywhere
 export DATABASE_URL="postgres://username:password@username.postgres.database.azure.com:5432/defaultdb"
 export SECRET_KEY="votre-secret-key"
