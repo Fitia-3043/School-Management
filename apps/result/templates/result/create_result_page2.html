@@ -3,14 +3,14 @@
 
 
 {% block title %}
-  Select all the subjects you want to create
+  Sélectionnez toutes les matières que vous voulez créer
 {% endblock title %}
 
 
 {% block content %}
 
 
-  <p>You selected <b>{{ count }} students</b> from the previous page.</p>
+  <p>Vous avez sélectionné <b>{{ count }} étudiants</b> depuis la page précédente.</p>
 
   <form method="POST">
     {% csrf_token %}
@@ -37,7 +37,7 @@
     <input type="hidden" name="finish" value="True">
     <input type="hidden" name="students" value="{{ students }}">
 
-    <input type="submit" class="btn btn-success" value="Create">
+    <input type="submit" class="btn btn-success" value="Créer">
   </form>
 
 {% endblock content %}

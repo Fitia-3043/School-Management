@@ -33,7 +33,7 @@ def profile_view(request):
     """Vue pour afficher et modifier le profil utilisateur"""
     if request.method == 'POST':
         if 'change_password' in request.POST:
-            # Gestion du changement de mot de passe
+            # fanovana mot de passe
             form = PasswordChangeForm(request.POST, instance=request.user)
             if form.is_valid():
                 if request.user.check_password(form.cleaned_data.get('current_password')):
@@ -44,7 +44,7 @@ def profile_view(request):
                 else:
                     messages.error(request, "Le mot de passe actuel est incorrect.")
         else:
-            # Gestion de la mise à jour du profil
+            # fanovana profil
             form = UserProfileForm(request.POST, instance=request.user)
             if form.is_valid():
                 form.save()
@@ -66,7 +66,7 @@ def dashboard_view(request):
     user = request.user
     
     if user.is_admin:
-        # Dashboard administrateur
+        # Dashboard an'admin
         from apps.students.models import Student
         from apps.staffs.models import Staff
         from apps.finance.models import Invoice
@@ -83,9 +83,9 @@ def dashboard_view(request):
         return render(request, 'users/admin_dashboard.html', context)
     
     elif user.is_staff_user:
-        # Dashboard personnel (enseignant)
+        # Dashboard perso (mpampianatra)
         if user.staff_profile:
-            # Récupérer les classes et matières de l'enseignant
+            # Maka matiere sy class an-mpampianatra
             context = {
                 'staff': user.staff_profile,
                 'user': user,
@@ -96,7 +96,7 @@ def dashboard_view(request):
             return redirect('profile')
     
     elif user.is_student_user:
-        # Dashboard étudiant
+        # Dashboard mpianatra
         if user.student_profile:
             from apps.finance.models import Invoice
             from apps.result.models import Result
@@ -112,5 +112,5 @@ def dashboard_view(request):
             messages.warning(request, "Votre profil étudiant n'est pas configuré.")
             return redirect('profile')
     
-    # Cas par défaut
+    # par défaut
     return render(request, 'users/dashboard.html', {'user': user})

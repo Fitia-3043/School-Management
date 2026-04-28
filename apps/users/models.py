@@ -16,7 +16,7 @@ class CustomUser(AbstractUser):
         verbose_name='Rôle'
     )
     
-    # Relations avec les modèles existants
+    # relations @modele efa misy
     student_profile = models.OneToOneField(
         'students.Student', 
         on_delete=models.SET_NULL, 
@@ -35,7 +35,7 @@ class CustomUser(AbstractUser):
         verbose_name='Profil personnel'
     )
     
-    # Champs supplémentaires
+    # Champs tsy tena iilaina akory
     phone = models.CharField(
         max_length=20, 
         blank=True, 

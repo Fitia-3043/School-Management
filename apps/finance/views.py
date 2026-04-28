@@ -17,13 +17,13 @@ class InvoiceListView(LoginRequiredMixin, ListView):
     paginate_by = 25
 
     def get_queryset(self):
-        # Récupérer le terme de recherche
+        # Recupere recherche
         search_query = self.request.GET.get('search', '').strip()
         
-        # Filtrer selon le rôle de l'utilisateur
+        # Filtration
         if hasattr(self.request.user, 'role'):
             if self.request.user.role == 'student':
-                # Étudiant : ne voir que ses propres factures
+                # Étudiant : ne voit que ses propre facturet
                 queryset = Invoice.objects.filter(
                     student=self.request.user.student_profile
                 )
@@ -35,7 +35,7 @@ class InvoiceListView(LoginRequiredMixin, ListView):
         else:
             queryset = super().get_queryset()
         
-        # Appliquer la recherche si fournie
+        # Appliquer ny recherche raha misy
         if search_query:
             queryset = queryset.filter(
                 student__surname__icontains=search_query

@@ -12,22 +12,21 @@ from .models import Result
 
 @login_required
 def create_result(request):
-    # Vérifier les permissions : seul le personnel peut créer des résultats
+    # Vérification des permissions : mpampianatra ihany no afaka mi-cree resultat
     if hasattr(request.user, 'role') and request.user.role == 'student':
         from django.core.exceptions import PermissionDenied
         raise PermissionDenied("Les étudiants ne peuvent pas créer de résultats.")
     
-    # Pour le personnel : ne montrer que les étudiants concernés
+    # personnel : mpianatra ao ihany
     if hasattr(request.user, 'role') and request.user.role == 'staff':
-        # Si enseignant, ne montrer que les étudiants de ses classes
-        students = Student.objects.all()  # Pour l'instant, tous les étudiants
+        students = Student.objects.all()  # tous les étudiants
     else:
         # Admin : voir tous les étudiants
         students = Student.objects.all()
     
     if request.method == "POST":
 
-        # after visiting the second page
+        # avy ni-visiter paage faharoa
         if "finish" in request.POST:
             form = CreateResults(request.POST)
             if form.is_valid():
@@ -86,7 +85,6 @@ def create_result(request):
                 if results:
                     Result.objects.bulk_create(results)
                     messages.success(request, f"{len(results)} nouveaux résultats créés avec succès")
-                    # Rediriger vers edit-results avec les étudiants et matières concernés
                     student_ids = [str(stu.id) for stu in Student.objects.filter(
                         id__in=students_ids.split(",")
                     )]
@@ -101,7 +99,7 @@ def create_result(request):
                 messages.error(request, "Formulaire invalide")
                 return redirect("create-result")
 
-        # after choosing students
+        # rehefa avy nisifidy mpianatra
         id_list = request.POST.getlist("students")
         if id_list:
             form = CreateResults(
@@ -123,7 +121,6 @@ def create_result(request):
 
 @login_required
 def edit_results(request):
-    # Vérifier les permissions : seul le personnel peut modifier des résultats
     if hasattr(request.user, 'role') and request.user.role == 'student':
         from django.core.exceptions import PermissionDenied
         raise PermissionDenied("Les étudiants ne peuvent pas modifier de résultats.")
@@ -135,16 +132,14 @@ def edit_results(request):
             messages.success(request, "Results successfully updated")
             return redirect("edit-results")
     else:
-        # Vérifier si des étudiants et/ou matières spécifiques sont demandés
         students_param = request.GET.get('students', '')
         subjects_param = request.GET.get('subjects', '')
         
-        # Debug: afficher les paramètres reçus
         print(f"DEBUG: students_param = {students_param}")
         print(f"DEBUG: subjects_param = {subjects_param}")
         
         if students_param or subjects_param:
-            # Filtrer par les étudiants et/ou matières sélectionnés
+            # filtre
             filters = {
                 'session': request.current_session,
                 'term': request.current_term
@@ -163,7 +158,7 @@ def edit_results(request):
             results = Result.objects.filter(**filters)
             print(f"DEBUG: Nombre de résultats filtrés: {results.count()}")
         else:
-            # Comportement par défaut : tous les résultats
+            # par défaut : résultat rehetra
             results = Result.objects.filter(
                 session=request.current_session, term=request.current_term
             )
@@ -175,20 +170,16 @@ def edit_results(request):
 
 class ResultListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        # Récupérer le terme de recherche
         search_query = request.GET.get('search', '').strip()
         
-        # Filtrer selon le rôle de l'utilisateur
         if hasattr(request.user, 'role'):
             if request.user.role == 'student':
-                # Étudiant : ne voir que ses propres résultats
                 results = Result.objects.filter(
                     student=request.user.student_profile,
                     session=request.current_session, 
                     term=request.current_term
                 )
             elif request.user.role in ['admin', 'staff']:
-                # Admin/Staff : voir tous les résultats
                 results = Result.objects.filter(
                     session=request.current_session, term=request.current_term
                 )
@@ -199,7 +190,6 @@ class ResultListView(LoginRequiredMixin, View):
                 session=request.current_session, term=request.current_term
             )
         
-        # Appliquer la recherche si fournie
         if search_query:
             results = results.filter(
                 student__surname__icontains=search_query
@@ -234,7 +224,7 @@ class ResultListView(LoginRequiredMixin, View):
                     "total_total": test_total + exam_total,
                 }
         else:
-            # Message adapté selon la recherche
+            # Message hafakely
             if search_query:
                 from django.contrib import messages
                 messages.info(request, f"Aucun résultat trouvé pour \"{search_query}\". Essayez avec un autre nom.")
