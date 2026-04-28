@@ -1,73 +1,194 @@
 {% extends 'base.html' %}
+{% load static %}
 
-
-{% block content-header %}
-<div class="card-header">
-  <div class="card-tools">
-    <a href="#" class="btn btn-tool">Print</a>
-    <a href="{% url 'staff-update' object.id %}" class="btn btn-tool">
-      <i class="fas fa-edit"></i>
-    </a>
-    <a href="{% url 'staff-delete' object.id %}" class="btn btn-tool">
-      <i class="fas fa-times"></i>
-    </a>
-  </div>
-</div>
-{% endblock content-header %}
+{% block title %}Profil de {{ object }}{% endblock title %}
 
 {% block content %}
-    <div class="row">
-      <div class="col-sm-4">
-        <div>
-          <h3>{{ object }} </h3>
-          <h5>{{ object.current_class }} </h5>
-          <h5>{{ object.get_gender_display }} </h5>
-          <h5>{{ object.get_current_status_display }} </h5>
+<style>
+  .profile-header-card {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .profile-header-card::after {
+    content: "";
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 50%;
+  }
+
+  .staff-avatar-large {
+    width: 120px;
+    height: 120px;
+    background: #f8fafc;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: #1e293b;
+    font-weight: 800;
+    border: 5px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  }
+
+  .info-card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    height: 100%;
+    transition: 0.3s;
+  }
+
+  .info-card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  }
+
+  .info-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .info-value {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 1rem;
+  }
+
+  .status-badge {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .action-bar {
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    padding: 1.5rem;
+    border-radius: 0 0 16px 16px;
+  }
+</style>
+
+<div class="container-fluid">
+  <div class="profile-header-card shadow-lg">
+    <div class="row align-items-center">
+      <div class="col-auto">
+        <div class="staff-avatar-large">
+          {{ object.firstname|slice:":1" }}{{ object.surname|slice:":1" }}
         </div>
       </div>
-      <div class="col-sm-8">
-        <div>
-          <div class="form-group border-bottom row">
-            <label class="col">
-              Date of Birth
-            </label>
-            <div class="col">
-              {{ object.date_of_birth }}
-            </div>
-          </div>
-
-          <div class="form-group border-bottom row">
-            <label class="col">
-               Mobile Number
-            </label>
-            <div class="col">
-              {{ object.mobile_number}}
-            </div>
-          </div>
-
-          <div class="form-group border-bottom row">
-            <label class="col">
-              Address
-            </label>
-            <div class="col">
-              {{ object.address }}
-            </div>
-          </div>
-          <div class="form-group border-bottom row">
-            <label class="col">
-              Comments
-            </label>
-            <div class="col">
-              {{ object.others }}
-            </div>
-          </div>
-
+      <div class="col ml-md-4">
+        <h1 class="display-4 mb-1" style="font-weight: 800; font-size: 2.5rem;">{{ object }}</h1>
+        <div class="d-flex align-items-center flex-wrap">
+          <span class="badge badge-primary mr-3 px-3 py-2">Matricule: #STF-{{ object.id }}</span>
+          <span class="text-light opacity-75"><i class="fas fa-envelope mr-2"></i>{{ object.email|default:"Email non renseigné" }}</span>
         </div>
+      </div>
+      <div class="col-auto text-right">
+        <div class="dropdown">
+          <button class="btn btn-light dropdown-toggle font-weight-bold" type="button" data-toggle="dropdown">
+            Actions
+          </button>
+          <div class="dropdown-menu dropdown-menu-right">
+            <a class="dropdown-item" href="{% url 'staff-update' object.id %}"><i class="fas fa-edit mr-2 text-primary"></i> Modifier</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item text-danger" href="{% url 'staff-delete' object.id %}"><i class="fas fa-trash mr-2"></i> Supprimer</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <div class="row">
+    <div class="col-md-8">
+      <div class="info-card shadow-sm mb-4">
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+          <h5 class="font-weight-bold mb-0">Informations détaillées</h5>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <div class="row">
+            <div class="col-sm-6 mb-4">
+              <div class="info-label">Prénom</div>
+              <div class="info-value">{{ object.firstname }}</div>
+            </div>
+            <div class="col-sm-6 mb-4">
+              <div class="info-label">Nom de famille</div>
+              <div class="info-value">{{ object.surname }}</div>
+            </div>
+            <div class="col-sm-6 mb-4">
+              <div class="info-label">Genre</div>
+              <div class="info-value">{{ object.get_gender_display }}</div>
+            </div>
+            <div class="col-sm-6 mb-4">
+              <div class="info-label">Date de naissance</div>
+              <div class="info-value">{{ object.date_of_birth|date:"d F Y" }}</div>
+            </div>
+            <div class="col-sm-6 mb-4">
+              <div class="info-label">Téléphone</div>
+              <div class="info-value">{{ object.mobile_number }}</div>
+            </div>
+            <div class="col-sm-6 mb-4">
+              <div class="info-label">Date d'embauche</div>
+              <div class="info-value">{{ object.date_of_admission|date:"d F Y" }}</div>
+            </div>
+          </div>
+          
+          <hr>
+          
+          <div class="mt-3">
+            <div class="info-label">Adresse de résidence</div>
+            <div class="info-value">{{ object.address }}</div>
+          </div>
+        </div>
       </div>
     </div>
 
-
-
-
+    <div class="col-md-4">
+      <div class="info-card shadow-sm">
+        <div class="card-header bg-transparent border-0 pt-4 px-4">
+          <h5 class="font-weight-bold mb-0">Statut actuel</h5>
+        </div>
+        <div class="card-body px-4">
+          <div class="mb-4">
+            <div class="info-label mb-2">État du compte</div>
+            {% if object.is_active %}
+              <span class="status-badge bg-success-light text-success">
+                <i class="fas fa-check-circle mr-1"></i> Actif
+              </span>
+            {% else %}
+              <span class="status-badge bg-secondary-light text-muted">
+                <i class="fas fa-clock mr-1"></i> Inactif
+              </span>
+            {% endif %}
+          </div>
+          
+          <div class="mb-4">
+            <div class="info-label">Commentaires/Notes</div>
+            <p class="small text-muted">{{ object.others|default:"Aucune note supplémentaire." }}</p>
+          </div>
+        </div>
+        
+        <div class="action-bar text-center">
+            <a href="{% url 'staff-list' %}" class="btn btn-outline-secondary btn-sm btn-block">
+                <i class="fas fa-arrow-left mr-2"></i> Retour à la liste
+            </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock content %}

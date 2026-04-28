@@ -1,39 +1,149 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 
-{% block title %}
-  {{title}}
-{% endblock title %}
-
-
-
-{% block title-side %}{% endblock title-side %}
+{% block title %}Configuration du Système{% endblock title %}
 
 {% block content %}
-  <form method="POST">
-    {% csrf_token %}
-    {{ formset.management_form}}
+<style>
+  /* Container centré pour une lecture facile des paramètres */
+  .config-wrapper {
+    display: flex;
+    justify-content: center;
+    height: calc(100vh - 180px);
+    overflow: hidden;
+    padding-top: 1rem;
+  }
 
-    <div class="mb-3">
-      {% for form in formset %}
-      <div class="form-group row">
-        {{ form.id }}
-        <div class="col-2">
-          <input type="text" class="form-control" value="{{ form.instance.key }}" readonly>
-        </div>
-        <div class="col-6">{{ form.value | add_class:"form-control" | attr:"required"}}</div>
+  .config-card {
+    background: white;
+    width: 100%;
+    max-width: 900px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+  }
 
-        {% if form.errors %}
+  .config-header {
+    padding: 1.5rem 2rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .config-header h4 { margin: 0; font-weight: 800; color: #1e293b; font-size: 1.1rem; }
 
-        {% endif %}
+  .config-scroll-area {
+    padding: 2rem;
+    overflow-y: auto;
+    flex-grow: 1;
+  }
 
-      </div>
-      {% endfor %}
+  /* Style des lignes de configuration */
+  .setting-row {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 1.5rem;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px dashed #e2e8f0;
+  }
+  .setting-row:last-child { border-bottom: none; }
+
+  /* Style de la clé (Label readonly) */
+  .key-label {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-family: 'Courier New', Courier, monospace; /* Look "code" pour les clés système */
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #475569;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  /* Champs de saisie */
+  .value-input {
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 0.95rem;
+    border: 1.5px solid #e2e8f0;
+    transition: all 0.2s;
+  }
+  .value-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  }
+
+  .config-footer {
+    padding: 1.5rem 2rem;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+    text-align: right;
+  }
+
+  .btn-save-config {
+    background: var(--primary);
+    color: white;
+    padding: 12px 40px;
+    border-radius: 10px;
+    font-weight: 700;
+    border: none;
+    transition: 0.2s;
+    cursor: pointer;
+  }
+  .btn-save-config:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  }
+</style>
+
+<div class="config-wrapper">
+  <div class="config-card">
+    
+    <div class="config-header">
+      <i class="fas fa-cogs text-primary"></i>
+      <h4>Paramètres Généraux du Site</h4>
     </div>
 
+    <div class="config-scroll-area">
+      <form method="POST" id="config-form">
+        {% csrf_token %}
+        {{ formset.management_form }}
 
-    <input type="submit" value="Enregistrer" class="w-25 btn btn-primary">
+        {% for form in formset %}
+          <div class="setting-row">
+            {{ form.id }}
+            
+            <div class="key-container">
+              <input type="text" class="key-label w-100" value="{{ form.instance.key }}" readonly>
+            </div>
 
-  </form>
+            <div class="value-container">
+              {{ form.value | add_class:"form-control value-input" }}
+              
+              {% if form.value.errors %}
+                <div class="text-danger small mt-1">
+                  <i class="fas fa-exclamation-triangle"></i> {{ form.value.errors.0 }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </form>
+    </div>
 
+    <div class="config-footer">
+      <button type="submit" form="config-form" class="btn-save-config">
+        <i class="fas fa-check-circle mr-2"></i> Enregistrer les modifications
+      </button>
+    </div>
+
+  </div>
+</div>
 {% endblock content %}

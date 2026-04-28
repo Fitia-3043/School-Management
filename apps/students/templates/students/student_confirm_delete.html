@@ -1,23 +1,130 @@
 {% extends 'base.html' %}
 
-
 {% block title %}
+  Confirmation de suppression d'élève
 {% endblock title %}
 
-
 {% block content %}
+<style>
+  .delete-container {
+    max-width: 600px;
+    margin: 3rem auto;
+    background: white;
+    border-radius: 20px;
+    border: 1px solid #fee2e2;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
 
-<form action="" method="POST">
-  {% csrf_token %}
+  .delete-header {
+    background: #fff1f2;
+    padding: 2rem;
+    text-align: center;
+    border-bottom: 1px solid #fee2e2;
+  }
 
-  <div class="alert">
-    <p>Are you sure you want to delete "{{ object }}"?</p>
-    <p>All contents attached to this student will be deleted</p>
+  .danger-icon {
+    width: 60px;
+    height: 60px;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin: 0 auto 1rem;
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+  }
+
+  .delete-body {
+    padding: 2.5rem;
+    text-align: center;
+  }
+
+  .target-object {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #1e293b;
+    margin: 1.5rem 0;
+    display: block;
+  }
+
+  .warning-notice {
+    background: #fff7ed;
+    border-left: 4px solid #f97316;
+    padding: 1rem;
+    text-align: left;
+    margin-bottom: 2rem;
+  }
+
+  .btn-confirm {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    width: 100%;
+    transition: 0.2s;
+  }
+
+  .btn-confirm:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+  }
+
+  .link-cancel {
+    display: inline-block;
+    margin-top: 1.5rem;
+    color: #64748b;
+    font-weight: 600;
+    transition: 0.2s;
+  }
+
+  .link-cancel:hover {
+    color: #1e293b;
+    text-decoration: none;
+  }
+</style>
+
+<div class="delete-container">
+  <div class="delete-header">
+    <div class="danger-icon">
+      <i class="fas fa-user-times"></i>
+    </div>
+    <h4 class="mb-0" style="font-weight: 800; color: #991b1b;">Suppression Définitive</h4>
   </div>
 
-  <input type="submit" class="btn btn-primary" value="Confirm">
+  <div class="delete-body">
+    <p class="text-muted">Vous êtes sur le point de retirer cet étudiant de la base de données :</p>
+    
+    <span class="target-object shadow-sm">
+      {{ object }}
+    </span>
 
-</form>
+    <div class="warning-notice">
+      <p class="small mb-0" style="color: #9a3412;">
+        <i class="fas fa-exclamation-circle mr-2"></i>
+        <strong>Attention :</strong> Toutes les notes, les bulletins et les informations de scolarité liés à cet élève seront <strong>définitivement perdus</strong>.
+      </p>
+    </div>
 
+    <form action="" method="POST">
+      {% csrf_token %}
+      <button type="submit" class="btn-confirm shadow">
+        Confirmer la suppression
+      </button>
+    </form>
 
+    <a href="{% url 'student-list' %}" class="link-cancel">
+      <i class="fas fa-undo-alt mr-1"></i> Annuler et retourner à la liste
+    </a>
+  </div>
+</div>
 {% endblock content %}

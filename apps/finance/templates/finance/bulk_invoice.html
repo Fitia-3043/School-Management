@@ -1,15 +1,146 @@
-
 {% extends 'base.html' %}
 
-
-{% block title %}
-Upload School Bills from excel
-{% endblock title %}
-
+{% block title %}Importation massive de factures{% endblock title %}
 
 {% block content %}
+<style>
+  .upload-container {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: calc(100vh - 180px);
+  }
 
-This page will cater for invoice upload from excel sheet
+  /* Zone de dépôt du fichier */
+  .drop-zone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 16px;
+    background: #f8fafc;
+    padding: 3rem 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+  }
+  .drop-zone:hover {
+    border-color: var(--primary);
+    background: #f1f5f9;
+  }
+  .drop-zone i { font-size: 3.5rem; color: #94a3b8; margin-bottom: 1rem; }
+  .drop-zone h5 { font-weight: 800; color: #1e293b; margin-bottom: 0.5rem; }
 
+  /* Guide de formatage */
+  .format-guide {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    padding: 1.5rem;
+  }
+  .format-guide h6 {
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
+  .excel-table-preview {
+    width: 100%;
+    font-size: 0.8rem;
+    border-collapse: collapse;
+    background: #f8fafc;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .excel-table-preview th { background: #e2e8f0; padding: 8px; color: #475569; border: 1px solid #cbd5e1; }
+  .excel-table-preview td { padding: 8px; border: 1px solid #cbd5e1; color: #64748b; }
+
+  .btn-upload-confirm {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 10px;
+    font-weight: 700;
+    box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+    transition: 0.2s;
+  }
+  .btn-upload-confirm:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(79, 70, 229, 0.3); }
+</style>
+
+<div class="upload-container">
+  
+  <div class="format-guide">
+    <h6><i class="fas fa-info-circle text-info"></i> Structure requise du fichier Excel (.xlsx / .csv)</h6>
+    <p class="small text-muted mb-3">Pour assurer un import correct, votre fichier doit contenir les colonnes suivantes dans cet ordre :</p>
+    
+    <table class="excel-table-preview">
+      <thead>
+        <tr>
+          <th>Matricule</th>
+          <th>Trimestre</th>
+          <th>Total à payer</th>
+          <th>Montant versé</th>
+          <th>Commentaire</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>STUD-001</td>
+          <td>1er Trimestre</td>
+          <td>500.00</td>
+          <td>200.00</td>
+          <td>Paiement partiel</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="drop-zone" id="drop-zone">
+    <form method="POST" enctype="multipart/form-data" id="upload-form">
+      {% csrf_token %}
+      <i class="fas fa-file-excel"></i>
+      <h5>Glissez votre fichier ici</h5>
+      <p class="text-muted small">ou cliquez pour parcourir vos dossiers</p>
+      
+      <input type="file" name="excel_file" id="file-input" style="display: none;" accept=".xlsx, .xls, .csv">
+      
+      <div id="file-name-display" class="mt-3 font-weight-bold text-primary" style="display: none;"></div>
+      
+      <button type="submit" class="btn-upload-confirm mt-4">
+        <i class="fas fa-cloud-upload-alt mr-2"></i> Lancer l'importation
+      </button>
+    </form>
+  </div>
+
+</div>
+
+<script>
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input');
+  const fileNameDisplay = document.getElementById('file-name-display');
+
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      fileNameDisplay.innerText = "Fichier sélectionné : " + e.target.files[0].name;
+      fileNameDisplay.style.display = 'block';
+    }
+  });
+
+  // Empêcher l'ouverture du fichier dans le navigateur lors du drag & drop
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, e => e.preventDefault());
+  });
+</script>
 {% endblock content %}

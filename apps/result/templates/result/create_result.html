@@ -1,66 +1,212 @@
 {% extends 'base.html' %}
 
-
 {% block title %}
-  Sélectionner le(s) étudiant(s) <span class="small">puis cliquez sur continuer</span>
+  Saisie des Notes : Sélection des Élèves
 {% endblock title %}
 
+{% block content %}
+<style>
+  /* Container principal */
+  .selection-container {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
 
-{% block content-header %}
-  <div class="card-header">
-    <h3 class="card-title">
-      <button type="submit" form="studentForm" class="btn btn-success">Continuer ></button>
-    </h3>
+  .selection-header {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-bottom: 2px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
 
-    <div class="card-tools">
-      <p class="small btn btn-tool">Vous pouvez également rechercher par nom/classe en tapant dans la boîte de recherche</p>
+  .instruction-text {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  /* Style de la barre de recherche personnalisée */
+  .search-area {
+    padding: 1rem 1.5rem;
+    background: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  
+  .search-input-group {
+    position: relative;
+    max-width: 400px;
+  }
+
+  .search-input-group i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+  }
+
+  .search-control {
+    padding-left: 35px !important;
+    border-radius: 10px !important;
+    border: 1px solid #e2e8f0;
+    height: 42px;
+  }
+
+  /* Table personnalisée */
+  .student-selection-table {
+    width: 100%;
+    margin-bottom: 0 !important;
+  }
+  .student-selection-table thead th {
+    background: #f1f5f9;
+    color: #475569;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 15px;
+    border: none;
+  }
+  .student-selection-table tbody td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  /* Ligne sélectionnée */
+  .selected-row {
+    background-color: #f0f7ff !important;
+  }
+
+  .custom-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+
+  .btn-proceed {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: 700;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-proceed:hover {
+    background: #059669;
+    transform: translateY(-1px);
+    color: white;
+  }
+
+  .class-badge {
+    background: #eef2ff;
+    color: #4f46e5;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+</style>
+
+<div class="selection-container">
+  <div class="selection-header">
+    <div>
+      <h5 class="mb-1" style="font-weight: 800; color: #1e293b;">Étape 1 : Choix des élèves</h5>
+      <p class="instruction-text">Cochez les élèves pour lesquels vous souhaitez saisir des notes.</p>
+    </div>
+    <button type="submit" form="studentForm" class="btn-proceed shadow-sm">
+      Continuer <i class="fas fa-arrow-right"></i>
+    </button>
+  </div>
+
+  <div class="search-area">
+    <div class="search-input-group">
+      <i class="fas fa-search"></i>
+      <input type="text" id="customSearch" class="form-control search-control" placeholder="Filtrer par nom ou classe...">
     </div>
   </div>
-{% endblock content-header %}
 
-
-{% block content %}
   <form id="studentForm" method="POST">
     {% csrf_token %}
 
-    <table id="studenttable" class="table table-sm table-bordered" data-page-length='100'>
-      <thead class="thead-light">
-        <tr>
-          <th><input type="checkbox" id="selecter"></th>
-          <th>Nom</th>
-          <th>Classe actuelle</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for student in students %}
+    <div class="table-responsive">
+      <table id="studenttable" class="table student-selection-table">
+        <thead>
           <tr>
-            <td><input type="checkbox" id="{{ student.id }}" name="students" value="{{ student.id}}"></td>
-            <td>{{student}} </td>
-            <td>{{student.current_class}}</td>
+            <th class="text-center" style="width: 50px;">
+              <input type="checkbox" id="selecter" class="custom-checkbox">
+            </th>
+            <th>Nom et Prénoms</th>
+            <th class="text-center">Classe Actuelle</th>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {% for student in students %}
+            <tr class="student-row">
+              <td class="text-center">
+                <input type="checkbox" name="students" value="{{ student.id }}" class="custom-checkbox student-check">
+              </td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="mr-3" style="width: 35px; height: 35px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #475569; font-weight: bold; font-size: 0.8rem;">
+                    {{ student.firstname|slice:":1" }}{{ student.surname|slice:":1" }}
+                  </div>
+                  <span class="font-weight-bold" style="color: #334155;">{{ student }}</span>
+                </div>
+              </td>
+              <td class="text-center">
+                <span class="class-badge">{{ student.current_class }}</span>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-    <button type="submit" class="btn btn-success mt-2">Proceed ></button>
+    <div class="p-4 bg-light text-right border-top">
+      <button type="submit" class="btn-proceed d-inline-flex shadow-sm">
+        Valider la sélection <i class="fas fa-chevron-right ml-1"></i>
+      </button>
+    </div>
   </form>
+</div>
 {% endblock content %}
-
 
 {% block morejs %}
 <script>
-  $('#studenttable').DataTable({
-    "ordering": false
-  });
+  $(document).ready(function() {
+    
+    // 1. Logique de la barre de recherche manuelle
+    $("#customSearch").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $("#studenttable tbody tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
+    });
 
-  $("#selecter").change(function () {
-    if (this.checked) {
-      $('input[name="students"]').prop('checked', true);
-    }
-    else {
-      $('input[name="students"]').prop('checked', false);
-    }
+    // 2. Tout sélectionner / Tout désélectionner
+    $("#selecter").change(function () {
+      const isChecked = this.checked;
+      // On ne coche que les lignes VISIBLES (pour éviter de cocher ce qui est filtré)
+      $('.student-check:visible').prop('checked', isChecked);
+      $('.student-row:visible').toggleClass('selected-row', isChecked);
+    });
+
+    // 3. Mettre en évidence la ligne quand on coche individuellement
+    $(document).on('change', '.student-check', function() {
+      $(this).closest('tr').toggleClass('selected-row', this.checked);
+    });
+
   });
 </script>
-
 {% endblock morejs %}

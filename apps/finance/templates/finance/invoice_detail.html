@@ -1,105 +1,174 @@
 {% extends 'base.html' %}
 {% load humanize %}
 
+{% block title %}Détail de la Facture{% endblock title %}
+
 {% block content-header %}
-<div class="card-header">
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0" style="font-weight: 800; color: #1e293b;">Facture : {{ object.student.surname }} {{ object.student.firstname }}</h4>
   <div class="card-tools">
-    <a href="#" class="btn btn-tool">Print</a>
-    <a href="{% url 'invoice-update' object.id %}" class="btn btn-tool">
-      <i class="fas fa-edit"></i>
+    <a href="#" class="btn btn-outline-secondary btn-sm" onclick="window.print()">
+      <i class="fas fa-print"></i> Imprimer
     </a>
-    <a href="{% url 'invoice-delete' object.id %}" class="btn btn-tool">
-      <i class="fas fa-times"></i>
+    <a href="{% url 'invoice-update' object.id %}" class="btn btn-outline-primary btn-sm ml-2">
+      <i class="fas fa-edit"></i> Modifier
+    </a>
+    <a href="{% url 'invoice-delete' object.id %}" class="btn btn-outline-danger btn-sm ml-2">
+      <i class="fas fa-trash"></i> Supprimer
     </a>
   </div>
 </div>
 {% endblock content-header %}
 
-
-
 {% block content %}
+<style>
+  /* Mise en page de type "Document" */
+  .invoice-wrapper {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  }
 
-<div class="row">
-  <div class="col-sm-4">
-    <h3>{{ object }} </h3>
-    <h5>{{ object.session }} </h5>
-    <h5>{{ object.term }} </h5>
-    <h5>{{ object.class_for }} </h5>
-    <h6>Status: {{ object.get_status_display }} </h6>
-    <hr>
-    <div>
-      <h4>Expected Balance: {{ object.balance | intcomma }}</h4>
+  /* Entête stylisée */
+  .invoice-info-card {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #f1f5f9;
+  }
+  .info-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
+  .info-value { font-size: 1rem; color: #1e293b; font-weight: 600; margin-bottom: 12px; }
+
+  /* Badge de statut */
+  .status-badge {
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 800;
+  }
+  .status-overdue { background: #fee2e2; color: #dc2626; }
+  .status-partial { background: #fef3c7; color: #d97706; }
+  .status-paid { background: #dcfce7; color: #15803d; }
+
+  /* Tableaux épurés */
+  .modern-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+  .modern-table th { background: #f8fafc; color: #64748b; font-size: 0.75rem; text-transform: uppercase; padding: 12px; border-bottom: 2px solid #e2e8f0; }
+  .modern-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+  
+  /* Footer de calcul */
+  .calc-row td { border: none; padding: 6px 12px; }
+  .calc-label { font-weight: 600; color: #64748b; text-align: right; }
+  .calc-value { font-weight: 700; color: #1e293b; text-align: right; width: 150px; }
+  .total-highlight { background: #f1f5f9; border-radius: 8px; font-size: 1.1rem; }
+  .balance-danger { color: #dc2626; font-size: 1.2rem; }
+
+  @media print {
+    .card-tools, .main-sidebar, .main-header { display: none !important; }
+    .invoice-wrapper { border: none; box-shadow: none; }
+  }
+</style>
+
+<div class="invoice-wrapper">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="invoice-info-card">
+        <p class="info-label">Référence</p>
+        <p class="info-value text-primary">{{ object }}</p>
+
+        <p class="info-label">Session & Trimestre</p>
+        <p class="info-value">{{ object.session }} <br> <small class="text-muted">{{ object.term }}</small></p>
+
+        <p class="info-label">Classe</p>
+        <p class="info-value">{{ object.class_for }}</p>
+
+        <p class="info-label">Statut du paiement</p>
+        <div>
+          <span class="status-badge {% if object.balance > 0 %}status-partial{% else %}status-paid{% endif %}">
+            {{ object.get_status_display }}
+          </span>
+        </div>
+      </div>
+      
+      <div class="mt-4 p-3 text-center" style="background: #fff7ed; border-radius: 12px; border: 1px solid #ffedd5;">
+        <p class="info-label">Solde restant à payer</p>
+        <h2 class="balance-danger mb-0 font-weight-bold">{{ object.balance | intcomma }}</h2>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <h6 class="font-weight-bold mb-3 text-muted"><i class="fas fa-list-ul mr-2"></i>Détails des frais</h6>
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th style="width: 50px;">#</th>
+            <th>Description</th>
+            <th class="text-right">Montant</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ item.description }}</td>
+            <td class="text-right font-weight-bold">{{ item.amount | intcomma }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <table class="w-100 mt-3">
+        <tr class="calc-row">
+          <td class="calc-label">Total frais du trimestre :</td>
+          <td class="calc-value">{{ object.amount_payable | intcomma }}</td>
+        </tr>
+        <tr class="calc-row">
+          <td class="calc-label">Arriérés (Trimestre précédent) :</td>
+          <td class="calc-value">{{ object.balance_from_previous_term | intcomma }}</td>
+        </tr>
+        <tr class="calc-row total-highlight">
+          <td class="calc-label">NET À PAYER :</td>
+          <td class="calc-value text-primary">{{ object.total_amount_payable | intcomma }}</td>
+        </tr>
+        <tr class="calc-row">
+          <td class="calc-label text-success">Total déjà versé :</td>
+          <td class="calc-value text-success">- {{ object.total_amount_paid | intcomma }}</td>
+        </tr>
+      </table>
     </div>
   </div>
-  <div class="col-sm-8">
-    <table class="table table-sm table-bordered">
-      Invoice Breakdown</br>
-      <thead class="thead-light">
-        <tr>
-          <th>S/N</th>
-          <th>Description</th>
-          <th>Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in items %}
-        <tr>
-          <td>{{ forloop.counter }} </td>
-          <td>{{ item.description }} </td>
-          <td>{{ item.amount }} </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-      <tfoot>
-        <tr>
-          <td></td>
-          <td>Total Amount this term</td>
-          <td>{{ object.amount_payable | intcomma}}</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>Balance from previous term</td>
-          <td>{{ object.balance_from_previous_term | intcomma }}</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>Total Amount Payable</td>
-          <td>{{ object.total_amount_payable | intcomma}}</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>Total Amount Paid</td>
-          <td>{{ object.total_amount_paid | intcomma}}</td>
-        </tr>
 
-      </tfoot>
-    </table>
+  <hr class="my-5" style="border-top: 2px dashed #e2e8f0;">
+
+  <div class="row">
+    <div class="col-12">
+      <h6 class="font-weight-bold mb-4"><i class="fas fa-history mr-2 text-muted"></i>Historique des règlements</h6>
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>N° Reçu</th>
+            <th>Date</th>
+            <th>Commentaire</th>
+            <th class="text-right">Montant versé</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for receipt in receipts %}
+          <tr>
+            <td><span class="badge badge-light">REC-{{ receipt.id }}</span></td>
+            <td>{{ receipt.date_paid | date:"d/m/Y" }}</td>
+            <td class="text-muted italic small">{{ receipt.comment|default:"-" }}</td>
+            <td class="text-right font-weight-bold text-success">{{ receipt.amount_paid | intcomma }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="text-center text-muted py-4">Aucun versement enregistré pour cette facture.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
-
-<hr>
-
-<h5>Payment History</h5>
-<table class="table table-bordered table-sm">
-  <thead class="thead-light">
-    <tr>
-      <th>S/N</th>
-      <th>Amount Paid</th>
-      <th>Date Paid</th>
-      <th>Comment Paid</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for receipt in receipts %}
-    <tr>
-      <td>{{ forloop.counter }}</td>
-      <td>{{ receipt.amount_paid}}</td>
-      <td>{{ receipt.date_paid}}</td>
-      <td>{{ receipt.comment}}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-
 {% endblock content %}

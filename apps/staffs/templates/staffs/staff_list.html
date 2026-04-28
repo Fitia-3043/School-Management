@@ -1,46 +1,182 @@
 {% extends 'base.html' %}
 
-{% block title %}Personnel{% endblock title %}
+{% block title %}Gestion du Personnel{% endblock title %}
 
 {% block breadcrumb %}
-<a class="btn btn-primary" href="{% url 'staff-create' %}"><i
-    class="fas fa-plus"></i> Nouveau personnel</a>
+<a class="btn btn-primary shadow-sm" href="{% url 'staff-create' %}" style="border-radius: 10px; font-weight: 700;">
+    <i class="fas fa-plus-circle mr-2"></i> Nouveau personnel
+</a>
 {% endblock breadcrumb %}
 
 {% block content %}
-  <table id="stafftable" class="table table-bordered table-hover">
-    <thead class="thead-light">
-      <tr>
-        <th>N°</th>
-        <th>S/N</th>
-        <th>Nom complet</th>
-        <th>Genre</th>
-        <th>Numéro de téléphone mobile</th>
-        <th>Statut</th>
-      </tr>
-    </thead>
-    <tbody>
+<style>
+  .staff-container {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
 
-      {% for staff in object_list %}
-        <tr class='clickable-row' data-href="{% url 'staff-detail' staff.id %}">
-          <td>{{ forloop.counter}}</td>
-          <td>{{ staff.surname}} {{staff.firstname }} {{staff.other_name }}</td>
-          <td>{{ staff.get_gender_display}}</td>
-          <td>{{ staff.mobile_number}}</td>
-          <td>{{ staff.get_current_status_display}}</td>
+  /* Barre de recherche personnalisée */
+  .search-section {
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .search-wrapper {
+    position: relative;
+    max-width: 500px;
+  }
+
+  .search-wrapper i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+  }
+
+  .search-input {
+    padding-left: 45px !important;
+    border-radius: 12px !important;
+    border: 1px solid #cbd5e1;
+    height: 45px;
+    font-size: 0.95rem;
+  }
+
+  /* Tableau */
+  .staff-table {
+    width: 100%;
+    margin-bottom: 0 !important;
+  }
+
+  .staff-table thead th {
+    background: #ffffff;
+    color: #64748b;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    padding: 15px;
+    border-top: none;
+    border-bottom: 2px solid #f1f5f9;
+  }
+
+  .clickable-row {
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .clickable-row:hover {
+    background-color: #f0f7ff !important;
+  }
+
+  .staff-table td {
+    padding: 15px;
+    vertical-align: middle;
+    color: #334155;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  /* Badges de statut */
+  .status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .status-active { background: #dcfce7; color: #166534; }
+  .status-inactive { background: #f1f5f9; color: #475569; }
+
+  .avatar-sm {
+    width: 32px;
+    height: 32px;
+    background: #e2e8f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.75rem;
+    color: #475569;
+  }
+</style>
+
+<div class="staff-container">
+  <div class="search-section">
+    <div class="search-wrapper">
+      <i class="fas fa-search"></i>
+      <input type="text" id="staffSearch" class="form-control search-input" placeholder="Rechercher par nom, téléphone ou statut...">
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table id="stafftable" class="table staff-table">
+      <thead>
+        <tr>
+          <th class="text-center">N°</th>
+          <th>Nom complet</th>
+          <th class="text-center">Genre</th>
+          <th>Contact</th>
+          <th class="text-center">Statut</th>
         </tr>
-      {% endfor %}
-
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for staff in object_list %}
+          <tr class='clickable-row' data-href="{% url 'staff-detail' staff.id %}">
+            <td class="text-center text-muted small">{{ forloop.counter }}</td>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="avatar-sm mr-3">
+                  {{ staff.firstname|slice:":1" }}{{ staff.surname|slice:":1" }}
+                </div>
+                <div>
+                  <span class="font-weight-bold d-block">{{ staff.surname }} {{ staff.firstname }}</span>
+                  <small class="text-muted">{{ staff.email|default:"" }}</small>
+                </div>
+              </div>
+            </td>
+            <td class="text-center">
+              {% if staff.gender == 'male' %}
+                <i class="fas fa-mars text-primary" title="Masculin"></i>
+              {% else %}
+                <i class="fas fa-venus text-danger" title="Féminin"></i>
+              {% endif %}
+            </td>
+            <td>
+              <span class="text-muted"><i class="fas fa-phone-alt mr-2 small"></i>{{ staff.mobile_number }}</span>
+            </td>
+            <td class="text-center">
+              <span class="status-badge {% if staff.get_current_status_display == 'Active' %}status-active{% else %}status-inactive{% endif %}">
+                {{ staff.get_current_status_display }}
+              </span>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock content %}
-
 
 {% block morejs %}
 <script>
-   $('#stafftable').DataTable({
-    select: false
+  $(document).ready(function() {
+    // 1. Rendre les lignes cliquables
+    $(".clickable-row").click(function() {
+      window.location = $(this).data("href");
     });
-</script>
 
+    // 2. Recherche dynamique (Remplace DataTables)
+    $("#staffSearch").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $("#stafftable tbody tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
+    });
+  });
+</script>
 {% endblock morejs %}

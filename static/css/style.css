@@ -1,0 +1,98 @@
+:root {
+    --primary: #2563eb;
+    --secondary: #64748b;
+    --bg-light: #f8fafc;
+    --white: #ffffff;
+    --sidebar-width: 260px;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-light);
+    height: 100vh;
+    overflow: hidden; /* Supprime le scroll global */
+}
+
+/* Layout Principal */
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar moderne */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: #1e293b;
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+}
+
+.sidebar-logo {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: var(--primary);
+}
+
+.nav-link {
+    padding: 0.75rem 1rem;
+    color: #cbd5e1;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s;
+}
+
+.nav-link:hover, .nav-link.active {
+    background-color: var(--primary);
+    color: white;
+}
+
+/* Zone de contenu */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.top-bar {
+    height: 60px;
+    background: var(--white);
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    padding: 0 2rem;
+}
+
+.content-body {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto; /* Seul le contenu défile si besoin */
+    background-color: var(--bg-light);
+}
+
+/* Tableaux modernes (pour tes listes d'étudiants) */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.data-table th {
+    background: #f1f5f9;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+}
+
+.data-table td {
+    padding: 1rem;
+    border-top: 1px solid #f1f5f9;
+}

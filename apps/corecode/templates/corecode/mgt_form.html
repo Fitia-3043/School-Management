@@ -2,37 +2,144 @@
 {% load widget_tweaks %}
 
 {% block title %}
-  {{title}}
+  {{ title }}
 {% endblock title %}
 
-
-
-{% block title-side %}{% endblock title-side %}
-
 {% block content %}
-  <div class="row">
-    <div class="col-sm-12">
-      <form method="POST">
+<style>
+  /* Container pour centrer le formulaire et éviter le scroll global */
+  .form-mgt-container {
+    display: flex;
+    justify-content: center;
+    padding-top: 1rem;
+    height: calc(100vh - 180px);
+    overflow: hidden;
+  }
+
+  .form-mgt-card {
+    background: white;
+    width: 100%;
+    max-width: 800px; /* Largeur optimale pour la lecture */
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-mgt-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #f1f5f9;
+    background: #f8fafc;
+  }
+
+  .form-mgt-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .form-mgt-body {
+    padding: 2rem;
+    overflow-y: auto; /* Seul le formulaire défile si nécessaire */
+    flex-grow: 1;
+  }
+
+  /* Style des champs */
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group label {
+    font-weight: 700;
+    color: #475569;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .help-text {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* Actions en bas */
+  .form-mgt-footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #f1f5f9;
+    background: #f8fafc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .btn-save-mgt {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 8px;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+
+  .btn-save-mgt:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: var(--primary-hover);
+  }
+</style>
+
+<div class="form-mgt-container">
+  <div class="form-mgt-card">
+    
+    <div class="form-mgt-header">
+      <h3>
+        <i class="fas fa-edit text-primary"></i> 
+        {{ title }}
+      </h3>
+    </div>
+
+    <div class="form-mgt-body">
+      <form method="POST" id="main-form">
         {% csrf_token %}
 
-        <div class="mb-3">
+        <div class="row">
           {% for field in form %}
-          <div class="form-group">
-            {{ field.label_tag}}
-            {{ field | add_class:"form-control" |add_error_class:"is-invalid" | attr:"required"}}
-            {{field.help_text}}
-            {{field.errors}}
+          <div class="col-md-6 form-group"> 
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            
+            {{ field | add_class:"form-control" | add_error_class:"is-invalid" }}
+            
+            {% if field.help_text %}
+              <small class="help-text">{{ field.help_text|safe }}</small>
+            {% endif %}
+            
+            {% for error in field.errors %}
+              <div class="invalid-feedback" style="display: block;">{{ error }}</div>
+            {% endfor %}
           </div>
           {% endfor %}
         </div>
-
-
-        <input type="submit" value="Enregistrer" class="w-25 btn btn-primary">
-
       </form>
     </div>
+
+    <div class="form-mgt-footer">
+      <a href="javascript:history.back()" class="text-muted small font-weight-bold">
+        <i class="fas fa-chevron-left"></i> Annuler
+      </a>
+      <button type="submit" form="main-form" class="btn-save-mgt">
+        <i class="fas fa-save mr-2"></i> Enregistrer
+      </button>
+    </div>
+
   </div>
-
+</div>
 {% endblock content %}
-
-

@@ -1,23 +1,124 @@
 {% extends 'base.html' %}
 
-
 {% block title %}
+  Confirmation de suppression
 {% endblock title %}
 
-
 {% block content %}
+<style>
+  .delete-card {
+    max-width: 600px;
+    margin: 2rem auto;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #fee2e2;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
 
-<form action="" method="POST">
-  {% csrf_token %}
+  .delete-header {
+    background: #fef2f2;
+    padding: 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid #fee2e2;
+  }
 
-  <div class="alert">
-    <p>Are you sure you want to delete "{{ object }}"?</p>
-    <p>All contents attached to this staff will be deleted</p>
+  .warning-icon {
+    font-size: 3rem;
+    color: #ef4444;
+    margin-bottom: 1rem;
+  }
+
+  .delete-body {
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .staff-name {
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: #1e293b;
+    display: block;
+    margin: 10px 0;
+  }
+
+  .warning-text {
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .danger-zone {
+    background: #fff1f2;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1.5rem;
+    border: 1px dashed #fda4af;
+  }
+
+  .btn-confirm-delete {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 10px;
+    font-weight: 700;
+    transition: 0.2s;
+    width: 100%;
+  }
+
+  .btn-confirm-delete:hover {
+    background: #dc2626;
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+
+  .btn-cancel {
+    display: block;
+    margin-top: 1rem;
+    color: #64748b;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  
+  .btn-cancel:hover {
+    color: #1e293b;
+    text-decoration: underline;
+  }
+</style>
+
+<div class="delete-card">
+  <div class="delete-header">
+    <div class="warning-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <h4 class="mb-0" style="font-weight: 800; color: #991b1b;">Action Irréversible</h4>
   </div>
 
-  <input type="submit" class="btn btn-primary" value="Confirm">
+  <div class="delete-body">
+    <p class="warning-text">
+      Êtes-vous absolument certain de vouloir supprimer le membre du personnel :
+      <span class="staff-name">"{{ object }}"</span>
+    </p>
 
-</form>
+    <div class="danger-zone">
+      <p class="small text-danger mb-0">
+        <i class="fas fa-info-circle"></i> 
+        <strong>Attention :</strong> Toutes les données liées à ce membre (historique, affectations, comptes) seront définitivement supprimées du système.
+      </p>
+    </div>
 
+    <form action="" method="POST" class="mt-4">
+      {% csrf_token %}
+      <button type="submit" class="btn-confirm-delete shadow-sm">
+        Oui, supprimer définitivement
+      </button>
+    </form>
 
+    <a href="javascript:history.back()" class="btn-cancel">
+      Non, annuler et revenir en arrière
+    </a>
+  </div>
+</div>
 {% endblock content %}

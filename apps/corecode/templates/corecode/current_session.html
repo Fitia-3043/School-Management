@@ -1,33 +1,125 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 
-{% block title %}
-Définir la Session et le Trimestre Actuels
-{% endblock title %}
-
-
-
-{% block title-side %}{% endblock title-side %}
+{% block title %}Paramètres de la Période{% endblock title %}
 
 {% block content %}
-<form method="POST">
-  {% csrf_token %}
+<style>
+  /* Centrage de la carte de configuration */
+  .config-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 200px);
+  }
 
-  <div class="mb-3">
-    {% for field in form %}
-    <div class="form-group row">
-      <div class="col-2">{{ field.label_tag}}</div>
-      <div class="col-6">
-        {{ field | add_class:"form-control"}}
-        <span class="small">{{ field.help_text |safe}}</span>
-      </div>
+  .config-card {
+    background: white;
+    max-width: 600px;
+    width: 100%;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+
+  .config-header {
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: center;
+  }
+
+  .config-header i {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+  }
+
+  .config-header h4 {
+    margin: 0;
+    font-weight: 800;
+    color: #1e293b;
+    font-size: 1.1rem;
+  }
+
+  .config-body {
+    padding: 2rem;
+  }
+
+  /* Style des champs de formulaire */
+  .form-group-config {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group-config label {
+    display: block;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    margin-bottom: 8px;
+  }
+
+  .help-text {
+    display: block;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 5px;
+    font-style: italic;
+  }
+
+  /* Bouton de validation */
+  .btn-save-config {
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+    box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+  }
+
+  .btn-save-config:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(79, 70, 229, 0.3);
+  }
+</style>
+
+<div class="config-container">
+  <div class="config-card">
+    <div class="config-header">
+      <i class="fas fa-calendar-check"></i>
+      <h4>Configuration du Calendrier</h4>
+      <p class="text-muted small mb-0">Définissez la session et le trimestre actifs pour tout le système</p>
     </div>
-    {% endfor %}
+
+    <div class="config-body">
+      <form method="POST">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="form-group-config">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field | add_class:"form-control form-control-lg" }}
+          {% if field.help_text %}
+            <span class="help-text">{{ field.help_text | safe }}</span>
+          {% endif %}
+          {% if field.errors %}
+            <div class="text-danger small">{{ field.errors }}</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn-save-config">
+          <i class="fas fa-save mr-2"></i> Mettre à jour la période
+        </button>
+      </form>
+    </div>
   </div>
-
-
-  <input type="submit" value="Enregistrer" class="w-25 btn btn-primary">
-
-</form>
-
+</div>
 {% endblock content %}

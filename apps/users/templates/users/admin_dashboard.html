@@ -3,111 +3,175 @@
 {% block title %}Tableau de bord Administrateur{% endblock title %}
 
 {% block content %}
-<div class="row">
-  <div class="col-12">
-    <div class="alert alert-info">
-      <h4><i class="fas fa-user-shield"></i> Tableau de bord Administrateur</h4>
-      <p>Bienvenue {{ user.get_full_name }}. Vous avez accès complet au système.</p>
-    </div>
-  </div>
-</div>
+<style>
+  /* Force le contenu à tenir dans la hauteur disponible sans scroll global */
+  .dashboard-fixed-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 160px); /* Ajuste selon la taille de ton header */
+    gap: 1rem;
+    overflow: hidden;
+  }
 
-<div class="row">
-  <div class="col-md-3">
-    <div class="card bg-primary text-white">
-      <div class="card-body">
-        <h5>Total Étudiants</h5>
-        <h2>{{ total_students }}</h2>
-        <a href="{% url 'student-list' %}" class="btn btn-sm btn-light">Voir tout</a>
-      </div>
-    </div>
-  </div>
-  
-  <div class="col-md-3">
-    <div class="card bg-success text-white">
-      <div class="card-body">
-        <h5>Total Personnel</h5>
-        <h2>{{ total_staff }}</h2>
-        <a href="{% url 'staff-list' %}" class="btn btn-sm btn-light">Voir tout</a>
-      </div>
-    </div>
-  </div>
-  
-  <div class="col-md-3">
-    <div class="card bg-warning text-white">
-      <div class="card-body">
-        <h5>Total Factures</h5>
-        <h2>{{ total_invoices }}</h2>
-        <a href="{% url 'invoice-list' %}" class="btn btn-sm btn-light">Voir tout</a>
-      </div>
-    </div>
-  </div>
-  
-  <div class="col-md-3">
-    <div class="card bg-info text-white">
-      <div class="card-body">
-        <h5>Session Actuelle</h5>
-        <h4>{{ current_session }}</h4>
-        <small>{{ current_term }}</small>
-      </div>
-    </div>
-  </div>
-</div>
+  /* Alerte compacte */
+  .alert-dashboard {
+    background: white;
+    border-left: 4px solid var(--primary);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
+  }
+  .alert-dashboard h4 { margin: 0; font-size: 1rem; color: var(--primary); }
+  .alert-dashboard p { margin: 0; font-size: 0.85rem; color: var(--text-secondary); }
 
-<div class="row mt-4">
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-header">
-        <h5>Étudiants récents</h5>
-      </div>
-      <div class="card-body">
-        <ul class="list-group list-group-flush">
+  /* Grille des stats : 4 colonnes égales */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+
+  .mini-card {
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: transform 0.2s;
+  }
+  .mini-card:hover { transform: translateY(-3px); }
+  .mini-card h5 { font-size: 0.75rem; text-transform: uppercase; color: #64748b; margin: 0; }
+  .mini-card h2 { font-size: 1.5rem; font-weight: 800; margin: 5px 0; color: #1e293b; }
+
+  /* Zone principale : 2 colonnes égales en hauteur */
+  .main-grid-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    flex-grow: 1; /* Prend toute la place restante */
+    min-height: 0; /* Important pour le scroll interne */
+  }
+
+  .scrollable-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .card-header-custom {
+    padding: 0.75rem 1rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  .card-body-custom {
+    padding: 1rem;
+    overflow-y: auto; /* Seul le corps de la carte scrolle si trop d'étudiants */
+    flex-grow: 1;
+  }
+
+  /* Boutons d'actions ultra-compacts */
+  .action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  .btn-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: 0.2s;
+    color: white;
+  }
+  .btn-action:hover { opacity: 0.9; transform: scale(1.02); }
+</style>
+
+<div class="dashboard-fixed-container">
+  
+  <div class="alert-dashboard">
+    <h4><i class="fas fa-user-shield"></i> Administration</h4>
+    <p>Bienvenue, {{ user.get_full_name }}. Voici l'état actuel de votre établissement.</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="mini-card" style="border-top: 4px solid #4f46e5;">
+      <h5>Étudiants</h5>
+      <h2>{{ total_students }}</h2>
+      <a href="{% url 'student-list' %}" class="btn-light" style="font-size: 0.7rem; text-decoration:none;">Détails →</a>
+    </div>
+    
+    <div class="mini-card" style="border-top: 4px solid #10b981;">
+      <h5>Personnel</h5>
+      <h2>{{ total_staff }}</h2>
+      <a href="{% url 'staff-list' %}" class="btn-light" style="font-size: 0.7rem; text-decoration:none;">Détails →</a>
+    </div>
+    
+    <div class="mini-card" style="border-top: 4px solid #f59e0b;">
+      <h5>Factures</h5>
+      <h2>{{ total_invoices }}</h2>
+      <a href="{% url 'invoice-list' %}" class="btn-light" style="font-size: 0.7rem; text-decoration:none;">Détails →</a>
+    </div>
+    
+    <div class="mini-card" style="border-top: 4px solid #06b6d4;">
+      <h5>Session</h5>
+      <h2 style="font-size: 1.1rem;">{{ current_session }}</h2>
+      <small style="font-size: 0.65rem; color: #94a3b8;">{{ current_term }}</small>
+    </div>
+  </div>
+
+  <div class="main-grid-row">
+    
+    <div class="scrollable-card">
+      <div class="card-header-custom">🎓 Étudiants récents</div>
+      <div class="card-body-custom">
+        <ul class="list-group list-group-flush" style="margin: 0;">
           {% for student in recent_students %}
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            {{ student }}
-            <small class="text-muted">{{ student.date_of_admission|date:"d/m/Y" }}</small>
+          <li class="list-group-item d-flex justify-content-between align-items-center" style="padding: 8px 0; font-size: 0.85rem;">
+            <span><i class="far fa-user" style="margin-right: 8px; color: #94a3b8;"></i>{{ student }}</span>
+            <small class="text-muted">{{ student.date_of_admission|date:"d/m" }}</small>
           </li>
           {% endfor %}
         </ul>
       </div>
     </div>
-  </div>
-  
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-header">
-        <h5>Actions rapides</h5>
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-6 mb-2">
-            <a href="{% url 'student-create' %}" class="btn btn-primary btn-block">
-              <i class="fas fa-user-plus"></i> Ajouter Étudiant
-            </a>
-          </div>
-          <div class="col-6 mb-2">
-            <a href="{% url 'staff-create' %}" class="btn btn-success btn-block">
-              <i class="fas fa-user-tie"></i> Ajouter Personnel
-            </a>
-          </div>
-          <div class="col-6 mb-2">
-            <a href="{% url 'invoice-create' %}" class="btn btn-warning btn-block">
-              <i class="fas fa-file-invoice"></i> Nouvelle Facture
-            </a>
-          </div>
-          <div class="col-6 mb-2">
-            <a href="{% url 'subjects' %}" class="btn btn-info btn-block">
-              <i class="fas fa-book"></i> Voir les matières
-            </a>
-          </div>
-          <div class="col-6 mb-2">
-            <a href="{% url 'create-result' %}" class="btn btn-secondary btn-block">
-              <i class="fas fa-chart-line"></i> Ajouter Résultats
-            </a>
-          </div>
+
+    <div class="scrollable-card">
+      <div class="card-header-custom">⚡ Actions rapides</div>
+      <div class="card-body-custom">
+        <div class="action-grid">
+          <a href="{% url 'student-create' %}" class="btn-action" style="background: #4f46e5;">
+            <i class="fas fa-plus"></i> Élève
+          </a>
+          <a href="{% url 'staff-create' %}" class="btn-action" style="background: #10b981;">
+            <i class="fas fa-plus"></i> Personnel
+          </a>
+          <a href="{% url 'invoice-create' %}" class="btn-action" style="background: #f59e0b;">
+            <i class="fas fa-file-invoice"></i> Facture
+          </a>
+          <a href="{% url 'subjects' %}" class="btn-action" style="background: #06b6d4;">
+            <i class="fas fa-book"></i> Matières
+          </a>
+          <a href="{% url 'create-result' %}" class="btn-action" style="background: #64748b; grid-column: span 2;">
+            <i class="fas fa-chart-line"></i> Ajouter des Résultats
+          </a>
         </div>
       </div>
     </div>
+
   </div>
 </div>
 {% endblock content %}

@@ -1,52 +1,204 @@
 {% extends 'base.html' %}
 
-{% block title %}Élèves{% endblock title %}
+{% block title %}Gestion des Élèves{% endblock title %}
 
 {% block breadcrumb %}
-<a class="btn btn-primary" href="{% url 'student-create' %}"><i
-    class="fas fa-plus"></i> Nouvel élève</a>
-<a class="btn btn-primary" href="{% url 'student-upload' %}"><i
-    class="fas fa-upload"></i> Télécharger des élèves</a>
+<div class="d-flex gap-2">
+  <a class="btn btn-primary shadow-sm mr-2" href="{% url 'student-create' %}" style="border-radius: 10px; font-weight: 700;">
+    <i class="fas fa-plus-circle mr-1"></i> Nouvel élève
+  </a>
+  <a class="btn btn-outline-primary shadow-sm" href="{% url 'student-upload' %}" style="border-radius: 10px; font-weight: 700;">
+    <i class="fas fa-file-upload mr-1"></i> Import Excel/CSV
+  </a>
+</div>
 {% endblock breadcrumb %}
 
 {% block content %}
+<style>
+  .list-container {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+
+  /* Barre de recherche personnalisée */
+  .search-area {
+    padding: 1.25rem 1.5rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .search-box {
+    position: relative;
+    max-width: 450px;
+  }
+
+  .search-box i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+  }
+
+  .search-input {
+    padding-left: 45px !important;
+    border-radius: 12px !important;
+    border: 1px solid #cbd5e1;
+    height: 45px;
+    transition: 0.2s;
+  }
+
+  .search-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  }
+
+  /* Tableau */
+  .custom-table {
+    width: 100%;
+    margin-bottom: 0 !important;
+  }
+
+  .custom-table thead th {
+    background: white;
+    color: #64748b;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    padding: 15px;
+    border-top: none;
+    border-bottom: 2px solid #f1f5f9;
+  }
+
+  .clickable-row {
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .clickable-row:hover {
+    background-color: #f0f7ff !important;
+    transform: scale(1.002);
+  }
+
+  .custom-table td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  .reg-number {
+    font-family: 'Courier New', Courier, monospace;
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    color: #475569;
+  }
+
+  .class-badge {
+    background: #eef2ff;
+    color: #4f46e5;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+
+  .status-pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+  }
+
+  .status-active { background: #dcfce7; color: #166534; }
+  .status-inactive { background: #fee2e2; color: #991b1b; }
+</style>
+
+<div class="list-container">
+  <div class="search-area">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="studentSearch" class="form-control search-input" placeholder="Rechercher un élève (Nom, Matricule, Classe...)">
+    </div>
+  </div>
+
   <div class="table-responsive">
-    <table id="studenttable" class="table table-bordered table-hover" data-page-length='100'>
-      <thead class="thead-light">
+    <table id="studenttable" class="table custom-table">
+      <thead>
         <tr>
-          <th>S/N</th>
-          <th>Nom complet</th>
-          <th>Numéro d'inscription</th>
-          <th>Classe actuelle</th>
-          <th>Genre</th>
-          <th>Numéro de téléphone mobile</th>
-          <th>Statut</th>
+          <th class="text-center">N°</th>
+          <th>Identité de l'élève</th>
+          <th class="text-center">Matricule</th>
+          <th class="text-center">Classe</th>
+          <th class="text-center">Genre</th>
+          <th>Parent / Contact</th>
+          <th class="text-center">Statut</th>
         </tr>
       </thead>
       <tbody>
-
         {% for student in object_list %}
           <tr class='clickable-row' data-href="{% url 'student-detail' student.id %}">
-            <td>{{ forloop.counter}}</td>
-            <td>{{ student.surname}} {{student.firstname }} {{student.other_name }}</td>
-            <td>{{ student.registration_number}}</td>
-            <td>{{ student.current_class}}</td>
-            <td>{{ student.get_gender_display}}</td>
-            <td>{{ student.parent_mobile_number}}</td>
-            <td>{{ student.get_current_status_display}}</td>
+            <td class="text-center text-muted small">{{ forloop.counter }}</td>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="mr-3" style="width: 35px; height: 35px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #475569; font-weight: bold; font-size: 0.8rem;">
+                  {{ student.firstname|slice:":1" }}{{ student.surname|slice:":1" }}
+                </div>
+                <div>
+                  <span class="font-weight-bold d-block" style="color: #1e293b;">{{ student.surname }} {{ student.firstname }}</span>
+                  <small class="text-muted">{{ student.other_name|default:"" }}</small>
+                </div>
+              </div>
+            </td>
+            <td class="text-center">
+              <span class="reg-number">{{ student.registration_number }}</span>
+            </td>
+            <td class="text-center">
+              <span class="class-badge">{{ student.current_class }}</span>
+            </td>
+            <td class="text-center">
+              {% if student.get_gender_display == 'Masculin' or student.gender == 'male' %}
+                <i class="fas fa-mars text-primary"></i>
+              {% else %}
+                <i class="fas fa-venus text-danger"></i>
+              {% endif %}
+            </td>
+            <td>
+              <span class="small text-muted"><i class="fas fa-phone mr-1"></i> {{ student.parent_mobile_number }}</span>
+            </td>
+            <td class="text-center">
+              <span class="status-pill {% if student.get_current_status_display == 'Active' or student.get_current_status_display == 'Actif' %}status-active{% else %}status-inactive{% endif %}">
+                {{ student.get_current_status_display }}
+              </span>
+            </td>
           </tr>
         {% endfor %}
-
       </tbody>
     </table>
   </div>
+</div>
 {% endblock content %}
-
 
 {% block morejs %}
 <script>
-  $('#studenttable').DataTable({
+  $(document).ready(function() {
+    // 1. Rendre les lignes cliquables
+    $(".clickable-row").click(function() {
+      window.location = $(this).data("href");
+    });
+
+    // 2. Recherche dynamique instantanée (Sans DataTables)
+    $("#studentSearch").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $("#studenttable tbody tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
+    });
   });
 </script>
-
 {% endblock morejs %}

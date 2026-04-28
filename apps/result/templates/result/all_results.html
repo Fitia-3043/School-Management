@@ -1,95 +1,168 @@
 {% extends 'base.html' %}
 
 {% block fullcard %}
+<style>
+  /* Barre de recherche élégante */
+  .search-wrapper {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  }
 
-<!-- Barre de recherche -->
-<div class="card mb-4">
-  <div class="card-body">
-    <form method="GET" class="row">
-      <div class="col-md-8">
-        <div class="input-group">
-          <input type="text" name="search" class="form-control" placeholder="Rechercher un élève..." value="{{ request.GET.search }}">
-          <div class="input-group-append">
-            <button class="btn btn-primary" type="submit">
-              <i class="fas fa-search"></i> Rechercher
-            </button>
-          </div>
+  /* Carte de résultat (Style Bulletin) */
+  .result-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2.5rem;
+    overflow: hidden;
+    background: white;
+  }
+
+  .result-card-header {
+    background: #f8fafc;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 2px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .student-name {
+    font-weight: 800;
+    color: #1e293b;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+  }
+
+  /* Table des notes */
+  .result-table { width: 100%; border-collapse: collapse; }
+  .result-table th {
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 800;
+    padding: 12px;
+    border: none;
+  }
+  .result-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+
+  /* Style des notes et grades */
+  .grade-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    background: #eef2ff;
+    color: #4f46e5;
+  }
+
+  .total-score-pill {
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  /* Footer de synthèse */
+  .result-footer {
+    background: #f8fafc;
+    font-weight: 800;
+    color: #1e293b;
+  }
+
+  .summary-pill {
+    background: #1e293b;
+    color: white;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+  }
+</style>
+
+<div class="search-wrapper mb-5">
+  <form method="GET" class="row align-items-center">
+    <div class="col-md-9">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text bg-transparent border-right-0 text-muted"><i class="fas fa-search"></i></span>
         </div>
+        <input type="text" name="search" class="form-control border-left-0" placeholder="Rechercher par nom d'élève..." value="{{ request.GET.search }}">
       </div>
-      <div class="col-md-4">
-        <button class="btn btn-secondary" type="button" onclick="clearSearch()">
-          <i class="fas fa-times"></i> Effacer
-        </button>
-      </div>
-    </form>
-  </div>
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+      <button class="btn btn-primary w-100 font-weight-bold" type="submit">Rechercher</button>
+      {% if request.GET.search %}
+        <a href="{% url 'view-results' %}" class="btn btn-light ml-2"><i class="fas fa-times"></i></a>
+      {% endif %}
+    </div>
+  </form>
 </div>
+
+{% for key, result in results.items %}
+  <div class="result-card">
+    <div class="result-card-header">
+      <div class="student-name">
+        <i class="fas fa-user-graduate text-primary mr-2"></i> {{ result.student }}
+      </div>
+      <div class="badge badge-primary px-3 py-2" style="border-radius: 8px;">
+        ID: {{ result.student.id }}
+      </div>
+    </div>
+    
+    <div class="card-body p-0">
+      <table class="result-table">
+        <thead>
+          <tr>
+            <th class="text-center" style="width: 50px;">#</th>
+            <th>Matière</th>
+            <th class="text-center">Test (/20)</th>
+            <th class="text-center">Examen (/80)</th>
+            <th class="text-center">Total (/100)</th>
+            <th class="text-center">Grade</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for subject in result.subjects %}
+            <tr>
+              <td class="text-center text-muted small">{{ forloop.counter }}</td>
+              <td class="font-weight-bold" style="color: #475569;">{{ subject.subject }}</td>
+              <td class="text-center">{{ subject.test_score }}</td>
+              <td class="text-center">{{ subject.exam_score }}</td>
+              <td class="text-center total-score-pill">{{ subject.total_score }}</td>
+              <td class="text-center">
+                <span class="grade-badge">{{ subject.grade }}</span>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot class="result-footer">
+          <tr>
+            <td colspan="2" class="text-right py-3">MOYENNE GÉNÉRALE / TOTAL :</td>
+            <td class="text-center">{{ result.test_total }}</td>
+            <td class="text-center">{{ result.exam_total }}</td>
+            <td class="text-center">
+              <span class="summary-pill">{{ result.total_total }}</span>
+            </td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+{% empty %}
+  <div class="text-center py-5">
+    <i class="fas fa-search fa-4x text-muted mb-3" style="opacity: 0.2;"></i>
+    <h4 class="text-muted">Aucun bulletin disponible</h4>
+    <p class="text-muted mb-4">La recherche n'a retourné aucun résultat ou aucune note n'a été saisie.</p>
+    <a href="{% url 'view-results' %}" class="btn btn-outline-primary px-4">Réinitialiser</a>
+  </div>
+{% endfor %}
 
 <script>
 function clearSearch() {
   window.location.href = "{% url 'view-results' %}";
 }
 </script>
-
-  {% for key, result in results.items %}
-    <div class="card">
-      <div class="card-header">
-        {{result.student}}
-      </div>
-      <div class="card-body">
-        <table class="table table-bordered table-sm">
-          <thead class="thead-light">
-            <tr>
-              <th></th>
-              <th>Matière</th>
-              <th>Note de test</th>
-              <th>Note d'examen</th>
-              <th>Note totale</th>
-              <th>Note</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for subject in result.subjects %}
-              <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ subject.subject }}</td>
-                <td>{{ subject.test_score }}</td>
-                <td>{{ subject.exam_score }}</td>
-                <td>{{ subject.total_score }}</td>
-                <td>{{ subject.grade }}</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="2"></td>
-              <td>{{ result.test_total }}</td>
-              <td>{{ result.exam_total }}</td>
-              <td>{{ result.total_total }}</td>
-              <td></td>
-            </tr>
-          </tfoot>
-        </table>
-
-
-
-      </div>
-    </div>
-  {% empty %}
-    <div class="card">
-      <div class="card-body text-center">
-        <i class="fas fa-search fa-3x text-muted mb-3"></i>
-        <h4 class="text-muted">Aucun résultat trouvé</h4>
-        <p class="text-muted">
-          {% if request.GET.search %}
-            Essayez avec un autre nom d'élève ou 
-            <a href="{% url 'view-results' %}" class="btn btn-sm btn-primary">affichez tous les résultats</a>
-          {% else %}
-            <a href="{% url 'create-result' %}" class="btn btn-primary">Ajoutez des résultats</a> pour commencer
-          {% endif %}
-        </p>
-      </div>
-    </div>
-  {% endfor %}
-
 {% endblock fullcard %}

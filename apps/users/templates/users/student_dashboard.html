@@ -1,160 +1,194 @@
 {% extends 'base.html' %}
 
-{% block title %}Tableau de bord Étudiant{% endblock title %}
+{% block title %}Mon Espace Étudiant{% endblock title %}
 
 {% block content %}
-<div class="row">
-  <div class="col-12">
-    <div class="alert alert-info">
-      <h4><i class="fas fa-graduation-cap"></i> Tableau de bord Étudiant</h4>
-      <p>Bienvenue {{ student.surname }} {{ student.firstname }}. Voici vos informations personnelles.</p>
-    </div>
-  </div>
-</div>
+<style>
+  /* Structure fixe sans scroll */
+  .student-fixed-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 160px);
+    gap: 1rem;
+    overflow: hidden;
+  }
 
-<div class="row">
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-header">
-        <h5>Informations personnelles</h5>
-      </div>
-      <div class="card-body">
-        <p><strong>Matricule:</strong> {{ student.registration_number }}</p>
-        <p><strong>Classe actuelle:</strong> {{ student.current_class|default:"Non assignée" }}</p>
-        <p><strong>Statut:</strong> {{ student.get_current_status_display }}</p>
-        <p><strong>Date d'admission:</strong> {{ student.date_of_admission|date:"d/m/Y" }}</p>
-        <p><strong>Téléphone des parents:</strong> {{ student.parent_mobile_number|default:"Non spécifié" }}</p>
-      </div>
-    </div>
-  </div>
-  
-  <div class="col-md-4">
-    <div class="card bg-warning text-white">
-      <div class="card-body">
-        <h5>Factures</h5>
-        <h2>{{ invoices.count }}</h2>
-        <p>Factures au total</p>
-        <a href="#" class="btn btn-light btn-sm">Voir les détails</a>
-      </div>
-    </div>
-  </div>
-  
-  <div class="col-md-4">
-    <div class="card bg-success text-white">
-      <div class="card-body">
-        <h5>Résultats</h5>
-        <h2>{{ results.count }}</h2>
-        <p>Résultats académiques</p>
-        <a href="#" class="btn btn-light btn-sm">Voir les détails</a>
-      </div>
-    </div>
-  </div>
-</div>
+  /* Cartes de statistiques (Factures/Résultats) */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    gap: 1rem;
+    flex-shrink: 0;
+  }
 
-<div class="row mt-4">
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-header">
-        <h5>Mes factures récentes</h5>
+  .student-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Style spécial pour les infos personnelles */
+  .personal-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 1rem;
+    padding: 1rem;
+  }
+  .info-tag { font-size: 0.7rem; color: #64748b; text-transform: uppercase; font-weight: 700; margin: 0; }
+  .info-val { font-size: 0.85rem; color: #1e293b; font-weight: 600; margin: 0 0 5px 0; }
+
+  /* Cartes colorées compactes */
+  .mini-stat-card {
+    padding: 1rem;
+    border-radius: 12px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+  .mini-stat-card h2 { font-size: 1.8rem; font-weight: 800; margin: 5px 0; }
+  .mini-stat-card i { position: absolute; right: 15px; top: 15px; opacity: 0.2; font-size: 2rem; }
+
+  /* Section Tableaux */
+  .data-grid-row {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 1rem;
+    flex-grow: 1;
+    min-height: 0;
+  }
+
+  .table-scroll-container {
+    padding: 0.5rem;
+    overflow-y: auto;
+    flex-grow: 1;
+  }
+
+  .custom-table {
+    width: 100%;
+    font-size: 0.85rem;
+    border-collapse: separate;
+    border-spacing: 0 5px;
+  }
+  .custom-table th { color: #64748b; font-weight: 700; padding: 8px; border-bottom: 2px solid #f1f5f9; }
+  .custom-table td { padding: 10px 8px; background: #f8fafc; }
+  .custom-table tr td:first-child { border-radius: 8px 0 0 8px; }
+  .custom-table tr td:last-child { border-radius: 0 8px 8px 0; }
+
+  /* Boutons d'actions en bas */
+  .bottom-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+</style>
+
+<div class="student-fixed-container">
+  
+  <div class="stats-row">
+    <div class="student-card">
+      <div class="personal-info-grid">
+        <div style="grid-column: span 2; border-bottom: 1px solid #f1f5f9; margin-bottom: 5px;">
+           <h6 style="margin:0; color:var(--primary); font-size:0.9rem;">
+             <i class="fas fa-id-card"></i> {{ student.surname }} {{ student.firstname }}
+           </h6>
+        </div>
+        <div><p class="info-tag">Matricule</p><p class="info-val">{{ student.registration_number }}</p></div>
+        <div><p class="info-tag">Classe</p><p class="info-val">{{ student.current_class|default:"-" }}</p></div>
+        <div><p class="info-tag">Admission</p><p class="info-val">{{ student.date_of_admission|date:"d/m/y" }}</p></div>
+        <div><p class="info-tag">Statut</p><p class="info-val">{{ student.get_current_status_display }}</p></div>
       </div>
-      <div class="card-body">
+    </div>
+
+    <div class="mini-stat-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+      <i class="fas fa-file-invoice"></i>
+      <p style="margin:0; font-size:0.8rem; font-weight:600;">Factures</p>
+      <h2>{{ invoices.count }}</h2>
+      <small>Total à ce jour</small>
+    </div>
+
+    <div class="mini-stat-card" style="background: linear-gradient(135deg, #10b981, #059669);">
+      <i class="fas fa-chart-line"></i>
+      <p style="margin:0; font-size:0.8rem; font-weight:600;">Résultats</p>
+      <h2>{{ results.count }}</h2>
+      <small>Évaluations publiées</small>
+    </div>
+  </div>
+
+  <div class="data-grid-row">
+    
+    <div class="student-card">
+      <div style="padding: 10px 15px; border-bottom: 1px solid #e2e8f0; font-weight:700; font-size:0.85rem; background:#f8fafc;">
+        <i class="fas fa-history"></i> Factures récentes
+      </div>
+      <div class="table-scroll-container">
         {% if invoices %}
-        <div class="table-responsive">
-          <table class="table table-sm">
-            <thead>
-              <tr>
-                <th>Session</th>
-                <th>Trimestre</th>
-                <th>Total</th>
-                <th>Payé</th>
-                <th>Solde</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for invoice in invoices|slice:":5" %}
-              <tr>
-                <td>{{ invoice.session }}</td>
-                <td>{{ invoice.term }}</td>
-                <td>{{ invoice.total_amount_payable }}</td>
-                <td>{{ invoice.total_amount_paid }}</td>
-                <td>{{ invoice.balance }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+        <table class="custom-table">
+          <thead>
+            <tr><th>Trim.</th><th>Total</th><th>Payé</th><th>Solde</th></tr>
+          </thead>
+          <tbody>
+            {% for invoice in invoices|slice:":5" %}
+            <tr>
+              <td style="font-weight:700;">{{ invoice.term }}</td>
+              <td>{{ invoice.total_amount_payable }}</td>
+              <td class="text-success">{{ invoice.total_amount_paid }}</td>
+              <td class="text-danger" style="font-weight:700;">{{ invoice.balance }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
         {% else %}
-        <p class="text-muted">Aucune facture trouvée.</p>
+        <p class="text-muted small p-3">Aucun historique de paiement.</p>
         {% endif %}
       </div>
     </div>
-  </div>
-  
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-header">
-        <h5>Mes résultats récents</h5>
-      </div>
-      <div class="card-body">
-        {% if results %}
-        <div class="table-responsive">
-          <table class="table table-sm">
-            <thead>
-              <tr>
-                <th>Matière</th>
-                <th>Test</th>
-                <th>Examen</th>
-                <th>Total</th>
-                <th>Note</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for result in results|slice:":5" %}
-              <tr>
-                <td>{{ result.subject }}</td>
-                <td>{{ result.test_score }}</td>
-                <td>{{ result.exam_score }}</td>
-                <td>{{ result.total_score }}</td>
-                <td>{{ result.grade }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        {% else %}
-        <p class="text-muted">Aucun résultat trouvé.</p>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-</div>
 
-<div class="row mt-4">
-  <div class="col-12">
-    <div class="card">
-      <div class="card-header">
-        <h5>Actions rapides</h5>
+    <div class="student-card">
+      <div style="padding: 10px 15px; border-bottom: 1px solid #e2e8f0; font-weight:700; font-size:0.85rem; background:#f8fafc;">
+        <i class="fas fa-star"></i> Dernières notes
       </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-4 mb-2">
-            <a href="{% url 'profile' %}" class="btn btn-primary btn-block">
-              <i class="fas fa-user-edit"></i> Modifier mon profil
-            </a>
-          </div>
-          <div class="col-md-4 mb-2">
-            <a href="#" class="btn btn-info btn-block">
-              <i class="fas fa-file-invoice"></i> Voir toutes les factures
-            </a>
-          </div>
-          <div class="col-md-4 mb-2">
-            <a href="#" class="btn btn-success btn-block">
-              <i class="fas fa-chart-line"></i> Voir tous les résultats
-            </a>
-          </div>
-        </div>
+      <div class="table-scroll-container">
+        {% if results %}
+        <table class="custom-table">
+          <thead>
+            <tr><th>Matière</th><th>Test</th><th>Exam</th><th>Grade</th></tr>
+          </thead>
+          <tbody>
+            {% for result in results|slice:":5" %}
+            <tr>
+              <td style="font-weight:700;">{{ result.subject }}</td>
+              <td>{{ result.test_score }}</td>
+              <td>{{ result.exam_score }}</td>
+              <td><span class="badge bg-primary">{{ result.grade }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p class="text-muted small p-3">Aucun résultat publié.</p>
+        {% endif %}
       </div>
     </div>
+
   </div>
+
+  <div class="bottom-actions">
+    <a href="{% url 'profile' %}" class="btn btn-outline-primary btn-sm" style="border-radius: 8px; font-weight:600;">
+      <i class="fas fa-user-cog"></i> Profil
+    </a>
+    <a href="#" class="btn btn-outline-warning btn-sm" style="border-radius: 8px; font-weight:600;">
+      <i class="fas fa-receipt"></i> Toutes les factures
+    </a>
+    <a href="#" class="btn btn-outline-success btn-sm" style="border-radius: 8px; font-weight:600;">
+      <i class="fas fa-graduation-cap"></i> Tous les résultats
+    </a>
+  </div>
+
 </div>
 {% endblock content %}

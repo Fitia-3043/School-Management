@@ -1,89 +1,174 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Connexion{% endblock title %}
+{% block title %}Connexion | {{ school_name | default:"Gestion Scolaire" }}{% endblock title %}
 
 {% block content %}
-<div style="min-height: 60vh; display: flex; align-items: center; justify-content: center;">
-  <div style="max-width: 400px; width: 100%; margin: 0 auto;">
-    <div style="text-align: center; margin-bottom: 2rem;">
-      <div style="font-size: 3rem; margin-bottom: 1rem; color: var(--primary-color);">
-        <i class="fas fa-school"></i>
-      </div>
-      <h1 style="margin: 0; font-size: 1.5rem; color: var(--text-primary); font-weight: 700;">
-        {{ school_name | default:"MonÉcole" }}
+<style>
+  /* On définit des variables au cas où elles ne seraient pas dans base.html */
+  :root {
+    --login-bg: #f8fafc;
+    --primary-blue: #3b82f6;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+  }
+
+  .login-wrapper {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .login-box {
+    max-width: 420px;
+    width: 100%;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .brand-logo {
+    font-size: 3.5rem;
+    background: linear-gradient(135deg, var(--primary-blue), #2563eb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+  }
+
+  .login-card {
+    background: white;
+    border-radius: 24px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+    padding: 2.5rem;
+  }
+
+  .custom-form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .custom-form-group label {
+    display: block;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .input-styled {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    transition: all 0.2s;
+    outline: none;
+  }
+
+  .input-styled:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  }
+
+  .btn-login {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    width: 100%;
+    transition: 0.3s;
+    cursor: pointer;
+  }
+
+  .btn-login:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+  }
+
+  .error-box {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+</style>
+
+<div class="login-wrapper">
+  <div class="login-box">
+    <div style="text-align: center; margin-bottom: 2.5rem;">
+      <i class="fas fa-graduation-cap brand-logo"></i>
+      <h1 style="margin: 0; font-size: 1.75rem; color: var(--text-main); font-weight: 800; letter-spacing: -0.025em;">
+        {{ school_name | default:"Espace Scolaire" }}
       </h1>
-      <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">
-        Système de gestion scolaire
+      <p style="margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 0.9rem;">
+        Accédez à votre tableau de bord sécurisé
       </p>
     </div>
 
-    <div class="card">
-      <div class="card-body">
-        {% if form.errors %}
-        <div style="background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem; font-size: 0.875rem;">
-          <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
-          Nom d'utilisateur ou mot de passe incorrect.
+    <div class="login-card">
+      {% if form.errors or form.non_field_errors %}
+      <div class="error-box">
+        <i class="fas fa-shield-alt"></i>
+        <span>Identifiants incorrects. Veuillez réessayer.</span>
+      </div>
+      {% endif %}
+
+      <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        
+        <div class="custom-form-group">
+          <label for="{{ form.username.id_for_label }}">Utilisateur</label>
+          <input type="text" 
+                 id="{{ form.username.id_for_label }}" 
+                 name="username" 
+                 class="input-styled" 
+                 placeholder="ex: fitia_admin"
+                 required>
         </div>
-        {% endif %}
 
-        <form action="{% url 'login' %}" method="post">
-          {% csrf_token %}
-          
-          <div class="form-group">
-            <label for="{{ form.username.id_for_label }}">
-              <i class="fas fa-user" style="margin-right: 0.5rem; color: var(--text-secondary);"></i>
-              Nom d'utilisateur
-            </label>
-            <input type="text" 
-                   id="{{ form.username.id_for_label }}" 
-                   name="username" 
-                   class="form-control" 
-                   placeholder="Entrez votre nom d'utilisateur"
-                   style="border-color: {% if form.username.errors %}#fecaca{% else %}var(--border-color){% endif %};">
-            {% if form.username.errors %}
-              <div style="color: #dc2626; font-size: 0.75rem; margin-top: 0.25rem;">
-                {% for error in form.username.errors %}{{ error }}{% endfor %}
-              </div>
-            {% endif %}
-          </div>
-
-          <div class="form-group">
-            <label for="{{ form.password.id_for_label }}">
-              <i class="fas fa-lock" style="margin-right: 0.5rem; color: var(--text-secondary);"></i>
-              Mot de passe
-            </label>
-            <input type="password" 
-                   id="{{ form.password.id_for_label }}" 
-                   name="password" 
-                   class="form-control" 
-                   placeholder="Entrez votre mot de passe"
-                   style="border-color: {% if form.password.errors %}#fecaca{% else %}var(--border-color){% endif %};">
-            {% if form.password.errors %}
-              <div style="color: #dc2626; font-size: 0.75rem; margin-top: 0.25rem;">
-                {% for error in form.password.errors %}{{ error }}{% endfor %}
-              </div>
-            {% endif %}
-          </div>
-
-          <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
-            <input type="checkbox" id="remember" name="remember" style="width: 1rem; height: 1rem; accent-color: var(--primary-color);">
-            <label for="remember" style="margin: 0; color: var(--text-secondary); font-size: 0.875rem; cursor: pointer;">
-              Se souvenir de moi
-            </label>
-          </div>
-
-          <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1.5rem;">
-            <i class="fas fa-sign-in-alt"></i> Se connecter
-          </button>
-        </form>
-
-        <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
-          <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem;">
-            <i class="fas fa-question-circle" style="margin-right: 0.5rem;"></i>
-            Besoin d'aide ? Contactez l'administrateur
-          </p>
+        <div class="custom-form-group">
+          <label for="{{ form.password.id_for_label }}">Mot de passe</label>
+          <input type="password" 
+                 id="{{ form.password.id_for_label }}" 
+                 name="password" 
+                 class="input-styled" 
+                 placeholder="••••••••"
+                 required>
         </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; margin: 0; cursor: pointer; font-size: 0.85rem; color: var(--text-muted);">
+            <input type="checkbox" name="remember" style="accent-color: var(--primary-blue); width: 16px; height: 16px;">
+            <span>Se souvenir de moi</span>
+          </label>
+          <a href="{% url 'password_reset' %}" style="font-size: 0.85rem; color: var(--primary-blue); font-weight: 600; text-decoration: none;">Oublié ?</a>
+        </div>
+
+        <button type="submit" class="btn-login">
+          Se connecter <i class="fas fa-arrow-right ml-2" style="font-size: 0.8rem;"></i>
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #f1f5f9;">
+        <p style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">
+          <i class="fas fa-lock" style="margin-right: 0.4rem; font-size: 0.75rem;"></i>
+          Connexion sécurisée SSL/TLS
+        </p>
       </div>
     </div>
   </div>

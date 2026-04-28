@@ -1,80 +1,170 @@
 {% extends 'base.html' %}
+{% load widget_tweaks %}
 
-{% block title %}Connexion{% endblock title %}
+{% block title %}Authentification{% endblock title %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-header">
-        <h4 class="text-center">Connexion</h4>
-      </div>
-      <div class="card-body">
-        <form method="post">
-          {% csrf_token %}
-          
-          <div class="form-group mb-3">
-            <label for="{{ form.username.id_for_label }}">Nom d'utilisateur</label>
-            {{ form.username | add_class:"form-control" }}
-            {% if form.username.errors %}
-              <div class="text-danger">{{ form.username.errors }}</div>
-            {% endif %}
-          </div>
-          
-          <div class="form-group mb-3">
-            <label for="{{ form.password.id_for_label }}">Mot de passe</label>
-            {{ form.password | add_class:"form-control" }}
-            {% if form.password.errors %}
-              <div class="text-danger">{{ form.password.errors }}</div>
-            {% endif %}
-          </div>
-          
-          <div class="form-group mb-3">
-            <div class="form-check">
-              <input type="checkbox" class="form-check-input" id="remember" name="remember">
-              <label class="form-check-label" for="remember">
-                Se souvenir de moi
-              </label>
-            </div>
-          </div>
-          
-          <div class="text-center">
-            <button type="submit" class="btn btn-primary">Se connecter</button>
-          </div>
-        </form>
+<style>
+  .login-container {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .login-card {
+    background: white;
+    border-radius: 24px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .login-header {
+    background: #1e293b;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    color: white;
+  }
+
+  .login-header i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #3b82f6;
+  }
+
+  .login-body {
+    padding: 2.5rem;
+  }
+
+  .form-label-custom {
+    font-weight: 700;
+    color: #475569;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+
+  .input-login {
+    border-radius: 12px !important;
+    padding: 12px 16px !important;
+    border: 1px solid #cbd5e1;
+    transition: 0.2s;
+  }
+
+  .input-login:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  }
+
+  .btn-login {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    width: 100%;
+    margin-top: 1rem;
+    transition: 0.3s;
+  }
+
+  .btn-login:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+  }
+
+  .test-accounts-section {
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+    padding: 1.5rem 2.5rem;
+  }
+
+  .test-badge {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 10px;
+    font-size: 0.75rem;
+  }
+
+  .test-badge strong { color: #1e293b; }
+</style>
+
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <i class="fas fa-university"></i>
+      <h3 class="font-weight-bold mb-0">Gestion Scolaire</h3>
+      <p class="text-light opacity-75 small mt-2">Connectez-vous à votre espace personnel</p>
+    </div>
+
+    <div class="login-body">
+      <form method="post" novalidate>
+        {% csrf_token %}
         
-        <div class="text-center mt-3">
-          <p>Pas encore de compte? <a href="{% url 'signup' %}">Créez un compte</a></p>
-          <p><a href="{% url 'password_reset' %}">Mot de passe oublié?</a></p>
+        <div class="form-group mb-4">
+          <label class="form-label-custom" for="{{ form.username.id_for_label }}">Identifiant</label>
+          {{ form.username | add_class:"form-control input-login" | attr:"placeholder:Nom d'utilisateur" }}
+          {% for error in form.username.errors %}
+            <div class="text-danger small mt-1 font-weight-bold">{{ error }}</div>
+          {% endfor %}
         </div>
         
-        <div class="mt-4">
-          <h6>Comptes de test:</h6>
-          <div class="row">
-            <div class="col-md-4">
-              <div class="card border-primary">
-                <div class="card-body">
-                  <h6>Administrateur</h6>
-                  <small>admin / admin123</small>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card border-success">
-                <div class="card-body">
-                  <h6>Personnel</h6>
-                  <small>enseignant / enseignant123</small>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card border-info">
-                <div class="card-body">
-                  <h6>Étudiant</h6>
-                  <small>etudiant / etudiant123</small>
-                </div>
-              </div>
-            </div>
+        <div class="form-group mb-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <label class="form-label-custom" for="{{ form.password.id_for_label }}">Mot de passe</label>
+            <a href="{% url 'password_reset' %}" class="small text-primary font-weight-bold">Oublié ?</a>
+          </div>
+          {{ form.password | add_class:"form-control input-login" | attr:"placeholder:••••••••" }}
+          {% for error in form.password.errors %}
+            <div class="text-danger small mt-1 font-weight-bold">{{ error }}</div>
+          {% endfor %}
+        </div>
+        
+        <div class="form-group mb-4">
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="remember" name="remember">
+            <label class="custom-control-label small text-muted" for="remember">
+              Rester connecté
+            </label>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn-login shadow">
+          Se connecter au portail <i class="fas fa-sign-in-alt ml-2"></i>
+        </button>
+      </form>
+      
+      <div class="text-center mt-4">
+        <p class="small text-muted">Pas encore de compte ? <a href="{% url 'signup' %}" class="font-weight-bold text-primary">Demander un accès</a></p>
+      </div>
+    </div>
+
+    <div class="test-accounts-section">
+      <h6 class="small font-weight-bold text-uppercase text-muted mb-3">Démos rapides (Mode Test)</h6>
+      <div class="row no-gutters">
+        <div class="col-4 pr-1">
+          <div class="test-badge">
+            <strong class="d-block">Admin</strong>
+            <code>admin</code>
+          </div>
+        </div>
+        <div class="col-4 px-1">
+          <div class="test-badge">
+            <strong class="d-block">Staff</strong>
+            <code>prof</code>
+          </div>
+        </div>
+        <div class="col-4 pl-1">
+          <div class="test-badge">
+            <strong class="d-block">Élève</strong>
+            <code>eleve</code>
           </div>
         </div>
       </div>

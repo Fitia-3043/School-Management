@@ -1,73 +1,146 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 
-
-{% block title %}
-Classes
-{% endblock title %}
-
+{% block title %}Gestion des Classes{% endblock title %}
 
 {% block breadcrumb %}
-  <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#modal1">
-    <i class="fa fa-plus"></i>
-    Ajouter une nouvelle classe
+  <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#modal1" style="border-radius: 8px; font-weight: 600; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);">
+    <i class="fa fa-plus-circle"></i>
+    Nouvelle classe
   </a>
 {% endblock breadcrumb %}
-  
 
 {% block content %}
-  <div class="row">
-    <div class="col-sm-12">
+<style>
+  /* Container pour le tableau sans scroll global */
+  .table-container-fixed {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    height: calc(100vh - 200px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
 
-        <table class="table table-bordered">
+  .table-header-custom {
+    padding: 1rem 1.5rem;
+    background: #f8fafc;
+    border-bottom: 2px solid #f1f5f9;
+    font-weight: 800;
+    color: #64748b;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  .scrollable-body {
+    overflow-y: auto;
+    flex-grow: 1;
+  }
+
+  /* Style du tableau moderne */
+  .table-modern {
+    width: 100%;
+    margin-bottom: 0;
+  }
+  .table-modern td {
+    padding: 1rem 1.5rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+    font-weight: 500;
+  }
+  .table-modern tr:hover {
+    background-color: #f8fafc;
+    transition: background 0.2s ease;
+  }
+
+  /* Actions icons */
+  .btn-edit-tool { color: #4f46e5; margin-right: 15px; transition: 0.2s; }
+  .btn-edit-tool:hover { color: #4338ca; transform: scale(1.2); }
+  
+  .btn-delete-tool { color: #ef4444; transition: 0.2s; }
+  .btn-delete-tool:hover { color: #b91c1c; transform: scale(1.2); }
+
+  /* Style du Modal */
+  .modal-content { border-radius: 15px; border: none; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+  .modal-header { border-bottom: 1px solid #f1f5f9; background: #f8fafc; border-radius: 15px 15px 0 0; }
+  .modal-footer { border-top: 1px solid #f1f5f9; }
+</style>
+
+<div class="row">
+  <div class="col-12">
+    <div class="table-container-fixed">
+      <div class="table-header-custom d-flex justify-content-between">
+        <span>Nom de la classe</span>
+        <span style="margin-right: 3rem;">Actions</span>
+      </div>
+      
+      <div class="scrollable-body">
+        <table class="table table-modern">
           <tbody>
             {% for object in object_list %}
             <tr>
-              <td>{{ object }}</td>
-              <td><a href="{% url 'class-update' object.id %}"><i
-                    class="fa fa-edit"></i></a> <a
-                  href="{% url 'class-delete' object.id %}"><i
-                    class="fa fa-trash-alt"></i></a></td>
+              <td>
+                <i class="fas fa-chalkboard text-muted mr-2"></i>
+                {{ object }}
+              </td>
+              <td class="text-right" style="width: 150px;">
+                <a href="{% url 'class-update' object.id %}" class="btn-edit-tool" title="Modifier">
+                  <i class="fa fa-edit"></i>
+                </a> 
+                <a href="{% url 'class-delete' object.id %}" class="btn-delete-tool" title="Supprimer">
+                  <i class="fa fa-trash-alt"></i>
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="2" class="text-center text-muted py-5">
+                Aucune classe enregistrée pour le moment.
+              </td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
-
-    </div>
-  </div>
-
-
-  <div class="modal fade" id="modal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form action="{% url 'class-create' %}" method="POST">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Ajouter une nouvelle classe</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-              {% csrf_token %}
-
-              {% for field in form %}
-                  <div class="form-group">
-                    {{field.label_tag}}
-                    {{ field|add_class:"form-control" }}
-                    {{field.help_text}}
-                    {{field.errors}}
-                  </div>
-              {% endfor %}
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-            <button type="submit" class="btn btn-primary">Enregistrer</button>
-          </div>
-        </form>
       </div>
     </div>
   </div>
+</div>
+
+<div class="modal fade" id="modal1" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form action="{% url 'class-create' %}" method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-weight: 700; color: #1e293b;">
+            <i class="fas fa-plus-circle text-primary mr-2"></i>Nouvelle classe
+          </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body p-4">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                  <label style="font-weight: 600; color: #64748b; font-size: 0.85rem;">{{ field.label }}</label>
+                  {{ field|add_class:"form-control" }}
+                  {% if field.help_text %}
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                  {% endif %}
+                  {{ field.errors }}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-dismiss="modal" style="font-weight: 600;">Annuler</button>
+          <button type="submit" class="btn btn-primary" style="font-weight: 600; padding: 0.5rem 1.5rem;">Enregistrer la classe</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 {% endblock content %}
-

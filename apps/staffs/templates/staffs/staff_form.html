@@ -1,30 +1,128 @@
 {% extends 'base.html' %}
-
+{% load widget_tweaks %}
 
 {% block title %}
-
   {% if object %}
-    Modifier {{ object }}
+    <i class="fas fa-user-edit mr-2"></i>Modifier {{ object }}
   {% else %}
-    Ajouter un nouveau personnel
+    <i class="fas fa-user-plus mr-2"></i>Ajouter un nouveau personnel
   {% endif %}
-
 {% endblock title %}
 
-
 {% block content %}
+<style>
+  .form-container {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    padding: 2.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
 
-<form action="" method="POST">
-  {% csrf_token %}
+  .form-section-title {
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #3b82f6;
+    border-bottom: 2px solid #eff6ff;
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+    margin-top: 30px;
+  }
 
-  {% include 'corecode/form_snippet.html' %}
+  .form-section-title:first-of-type {
+    margin-top: 0;
+  }
 
-  {% if object %}
-    <input type="submit" class="btn btn-primary" value="Mettre à jour">
-  {% else %}
-    <input type="submit" class="btn btn-primary" value="Ajouter le personnel">
-  {% endif %}
-</form>
+  .form-group label {
+    font-weight: 700;
+    color: #475569;
+    font-size: 0.9rem;
+  }
 
+  .form-control-custom {
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    padding: 10px 15px;
+    transition: all 0.2s;
+  }
 
+  .form-control-custom:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .btn-submit-main {
+    background: #1e293b;
+    color: white;
+    border: none;
+    padding: 12px 40px;
+    border-radius: 10px;
+    font-weight: 700;
+    transition: all 0.2s;
+    width: 100%;
+    margin-top: 2rem;
+  }
+
+  .btn-submit-main:hover {
+    background: #0f172a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Pour les erreurs Django */
+  .errorlist {
+    color: #ef4444;
+    font-size: 0.85rem;
+    list-style: none;
+    padding-left: 0;
+  }
+</style>
+
+<div class="form-container">
+  <form action="" method="POST" novalidate>
+    {% csrf_token %}
+
+    <div class="form-section-title">État Civil & Identité</div>
+    <div class="row">
+      {% for field in form %}
+        <div class="col-md-6 mb-3">
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field|add_class:"form-control form-control-custom" }}
+            {% if field.help_text %}
+              <small class="text-muted d-block mt-1">{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+              <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        
+        {# On peut forcer des séparateurs visuels basés sur l'ordre des champs si besoin #}
+      {% endfor %}
+    </div>
+
+    <div class="text-right mt-4">
+      <hr>
+      <div class="row">
+        <div class="col-md-4">
+          <a href="javascript:history.back()" class="btn btn-light btn-block p-3">Annuler</a>
+        </div>
+        <div class="col-md-8">
+          <button type="submit" class="btn-submit-main">
+            {% if object %}
+              <i class="fas fa-save mr-2"></i>Mettre à jour les informations
+            {% else %}
+              <i class="fas fa-check-circle mr-2"></i>Enregistrer le personnel
+            {% endif %}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
 {% endblock content %}

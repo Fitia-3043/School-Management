@@ -1,30 +1,161 @@
 {% extends 'base.html' %}
-
+{% load widget_tweaks %}
 
 {% block title %}
-
   {% if object %}
-    Modifier {{ object }}
+    <i class="fas fa-user-edit mr-2"></i>Modifier le dossier de {{ object }}
   {% else %}
-    Ajouter un nouvel étudiant
+    <i class="fas fa-user-plus mr-2"></i>Inscription d'un nouvel étudiant
   {% endif %}
-
 {% endblock title %}
 
-
 {% block content %}
+<style>
+  .form-card {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    max-width: 950px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
 
-<form action="" method="POST" enctype="multipart/form-data">
-  {% csrf_token %}
+  .form-header-accent {
+    height: 8px;
+    background: linear-gradient(to right, #3b82f6, #60a5fa);
+  }
 
-  {% include 'corecode/form_snippet.html' %}
+  .form-body {
+    padding: 2.5rem;
+  }
 
-  {% if object %}
-    <input type="submit" class="btn btn-primary" value="Mettre à jour">
-  {% else %}
-    <input type="submit" class="btn btn-primary" value="Ajouter l'étudiant">
-  {% endif %}
-</form>
+  .form-section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    margin-top: 2rem;
+  }
 
+  .form-section-header hr {
+    flex-grow: 1;
+    border-top: 1px solid #e2e8f0;
+    margin-left: 15px;
+  }
 
+  .form-section-title {
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #64748b;
+  }
+
+  /* Style des champs */
+  .custom-input {
+    border-radius: 10px !important;
+    border: 1px solid #cbd5e1;
+    padding: 12px 15px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+  }
+
+  .custom-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  }
+
+  /* Style spécifique pour le champ Passport (Photo) */
+  input[type="file"] {
+    background: #f8fafc;
+    padding: 10px;
+    border: 2px dashed #e2e8f0;
+    border-radius: 10px;
+    width: 100%;
+  }
+
+  .btn-submit-student {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.3s;
+    width: 100%;
+  }
+
+  .btn-submit-student:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+  }
+</style>
+
+<div class="form-card">
+  <div class="form-header-accent"></div>
+  <div class="form-body">
+    
+    <form action="" method="POST" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+
+      <div class="form-section-header">
+        <span class="form-section-title">Informations Identité</span>
+        <hr>
+      </div>
+
+      <div class="row">
+        {% for field in form %}
+          <div class="col-md-6 mb-4">
+            <label class="font-weight-bold text-dark small mb-2" for="{{ field.id_for_label }}">
+              {{ field.label }} {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+            </label>
+            
+            {{ field|add_class:"form-control custom-input" }}
+            
+            {% if field.help_text %}
+              <small class="text-muted d-block mt-1">{{ field.help_text }}</small>
+            {% endif %}
+            
+            {% for error in field.errors %}
+              <div class="text-danger small mt-1 font-weight-bold">
+                <i class="fas fa-exclamation-circle mr-1"></i> {{ error }}
+              </div>
+            {% endfor %}
+          </div>
+
+          {# On peut ajouter des titres de section manuellement après certains champs si besoin #}
+          {% if forloop.counter == 4 %}
+            </div> <div class="form-section-header">
+              <span class="form-section-title">Contact & Administration</span>
+              <hr>
+            </div>
+            <div class="row">
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="mt-5 border-top pt-4">
+        <div class="row align-items-center">
+          <div class="col-md-4 mb-3 mb-md-0">
+            <a href="{% url 'student-list' %}" class="text-muted font-weight-bold">
+              <i class="fas fa-arrow-left mr-2"></i> Annuler et retourner
+            </a>
+          </div>
+          <div class="col-md-8">
+            <button type="submit" class="btn-submit-student">
+              {% if object %}
+                <i class="fas fa-user-check mr-2"></i> Mettre à jour le dossier
+              {% else %}
+                <i class="fas fa-user-plus mr-2"></i> Finaliser l'inscription
+              {% endif %}
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
 {% endblock content %}
