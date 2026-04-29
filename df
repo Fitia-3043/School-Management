@@ -1,0 +1,21 @@
+* [33me1e9fee[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Modification moderne du design
+* [33me78570e[m Modification du style
+* [33m450f10d[m Final Version
+* [33m752f94d[m Ajout de .env de PythonEverywhere
+* [33mf59cd48[m Préparation pour PythonAnywhere
+* [33m4ff2f41[m Modification de requirement.txt
+* [33m49fbcf4[m Suppression de psycopg2 (rewuirement inutile)
+* [33m3e9eb78[m Supression definitive des logs fichiers
+* [33me036d70[m Suppression definitive du fileHandler de logs
+* [33m71550cb[m wsgi.py final
+* [33m9259b35[m Ajout de LOGGIN={} dans settings.py
+* [33m63138f8[m Suppression de debug.log
+* [33m153e63d[m Suppression des logs fichiers pour Vercel
+* [33m47d7fdc[m amelioration de wsgi.py
+* [33m19d6588[m Correction de depandance wsgi
+* [33m80b4f68[m Ajout de requirement.txt
+* [33m994c0ca[m Autorisation de l'hote ajouter
+* [33md7da682[m versel en vercel (Erreur de fichier)
+* [33m6dc2725[m Ajout de versel.json pour son deploiemnt
+* [33mf0d95d0[m Suppression de comment
+* [33ma1a36ab[m Correction configuration identity

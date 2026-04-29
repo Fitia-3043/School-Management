@@ -132,13 +132,13 @@
             </td>
             <td class="text-right" onclick="event.stopPropagation();">
               <a href="{% url 'receipt-create' %}?invoice={{ invoice.id }}" class="action-btn btn-success" title="Encaisser">
-                <i class="fas fa-plus"></i>
+                <i class="fas fa-plus">Créer</i>
               </a>
               <a href="{% url 'invoice-update' invoice.id %}" class="action-btn btn-warning ml-1" title="Modifier">
-                <i class="fas fa-edit"></i>
+                <i class="fas fa-edit">Modifier</i>
               </a>
               <a href="{% url 'invoice-delete' invoice.id %}" class="action-btn btn-danger ml-1" title="Supprimer">
-                <i class="fas fa-trash-alt"></i>
+                <i class="fas fa-trash-alt">Supprimer</i>
               </a>
             </td>
           </tr>

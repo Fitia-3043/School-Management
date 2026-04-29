@@ -297,12 +297,13 @@ input[type="checkbox"] {
 }
   </style>
 </head>
-
 <body>
   <aside class="sidebar">
     <div class="brand-section">
       <a href="{% url 'home' %}" class="brand">
         <i class="fas fa-graduation-cap text-primary" style="color:var(--primary)"></i>
+        <!-- logo --->
+        <!-- <img src="{% static 'dist/img/login.png' %}" alt="logo"> -->
         <span>{{ school_name | default:"MonÉcole" }}</span>
       </a>
     </div>
